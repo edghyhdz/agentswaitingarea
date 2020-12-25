@@ -1,7 +1,7 @@
 #include "Agent.h"
+#include <algorithm>
 #include <mutex>
 #include <random>
-#include <algorithm>
 
 Agent::Agent() {
   _currentPosition = nullptr;
@@ -100,7 +100,7 @@ bool Agent::moveToValidCell() {
   std::cout << printGrid;
   std::cout << "\n";
 
-  std::tuple<int, int> tmp = this->_currentPosition->getCoordinates(); 
+  std::tuple<int, int> tmp = this->_currentPosition->getCoordinates();
   int x_init = std::get<0>(tmp);
   int y_init = std::get<1>(tmp);
 
@@ -108,14 +108,12 @@ bool Agent::moveToValidCell() {
   for (int i = 0; i < _currentGrid[0].size(); i++) {
     std::string rows;
     for (int k = 0; k < _currentGrid.size(); k++) {
-      if (x_init == k && y_init == i){
-        rows += "A "; 
-      }
-      else if (_currentGrid[k][i] == 3) {
+      if (x_init == k && y_init == i) {
+        rows += "A ";
+      } else if (_currentGrid[k][i] == 3) {
         rows += "x ";
-      }
-      else {
-        rows += "· "; 
+      } else {
+        rows += "· ";
       }
     }
     aPathString += rows + "\n";
@@ -129,36 +127,43 @@ bool Agent::moveToValidCell() {
   _openList.clear();
   this->_currentPosition->updateCell();
 
-
   std::shared_ptr<GridCell> next_grid_test;
 
   std::tuple<int, int> coordinates = this->_currentPosition->getCoordinates();
   int x_this = std::get<0>(coordinates);
   int y_this = std::get<1>(coordinates);
-  for (int i = 0; i < 4; i++) {
-      int x_1 = x_this + delta[i][0];
-      int y_1 = y_this + delta[i][1];
 
-      // Check first if cells are on grid and if they 
-      // have value = 3, meaning they are found a* path
-      bool on_grid_x = (x_1 >= 0 && x_1 < this->_currentPosition->getX());
-      bool on_grid_y = (y_1 >= 0 && y_1 < this->_currentPosition->getY());
-      if (on_grid_x && on_grid_y){
-        if (_currentGrid[x_1][y_1] == 3){
-          int cellID = this->_currentPosition->getX() * (y_1 + 1) - (this->_currentPosition->getX() - x_1); 
-          next_grid_test = _cells.at(cellID); 
-          break;
-        }
+  std::vector<int> validCells;
+  for (int i = 0; i < 4; i++) {
+    int x_1 = x_this + delta[i][0];
+    int y_1 = y_this + delta[i][1];
+
+    // Check first if cells are on grid and if they
+    // have value = 3, meaning they are found a* path
+    bool on_grid_x = (x_1 >= 0 && x_1 < this->_currentPosition->getX());
+    bool on_grid_y = (y_1 >= 0 && y_1 < this->_currentPosition->getY());
+    if (on_grid_x && on_grid_y) {
+      if (_currentGrid[x_1][y_1] == 3) {
+        int cellID = this->_currentPosition->getX() * (y_1 + 1) -
+                     (this->_currentPosition->getX() - x_1);
+        validCells.push_back(cellID);
+        // next_grid_test = _cells.at(cellID);
+        // break;
       }
     }
+  }
 
+  // Choose next cell randomly from validCells vector
+  std::random_device rd;
+  std::mt19937 eng(rd());
+  std::uniform_int_distribution<> distr(0, validCells.size() - 1);
+  next_grid_test = _cells.at(validCells.at(distr(eng))); 
 
   // Choose a random cell to move
   // std::shared_ptr<GridCell> next_grid;
   // std::random_device rd;
   // std::mt19937 eng(rd());
   // std::uniform_int_distribution<> distr(0, _cells.size() - 1);
-
 
   // next_grid = _cells.at(distr(eng));
   // Release previous cell
