@@ -30,7 +30,7 @@ void Agent::walk() {
   bool hasEnteredCellGrid = false;
 
   // Update every 1 sec
-  double cycleDuration = 1000;
+  double cycleDuration = 500;
   std::chrono::time_point<std::chrono::system_clock> lastUpdate;
 
   lastUpdate = std::chrono::system_clock::now();
