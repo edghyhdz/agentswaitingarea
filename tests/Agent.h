@@ -20,8 +20,8 @@ public:
   bool moveToValidCell();
   void calculatePath();  
   void setGridCells(std::vector<std::shared_ptr<GridCell>> cells); 
-  void setCurrentGrid(); 
-  void setPreviousPosition(std::shared_ptr<GridCell> position); 
+  void setCurrentGrid();
+  // void setPreviousPosition(std::shared_ptr<GridCell> position);
   std::shared_ptr<Agent> get_shared_this() { return shared_from_this(); }
 
   // Related to A* search
@@ -37,7 +37,7 @@ public:
 private:
   void move();
   std::shared_ptr<GridCell> _currentPosition;
-  std::shared_ptr<GridCell> _previousPosition; 
+  // std::shared_ptr<GridCell> _previousPosition; 
   double _speed;
   std::vector<std::shared_ptr<GridCell>> _cells;
   std::vector<std::vector<int>> _openList; 

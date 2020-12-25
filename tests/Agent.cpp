@@ -136,9 +136,9 @@ bool Agent::moveToValidCell() {
   this->setCurrentPosition(next_grid);
 };
 
-void Agent::setPreviousPosition(std::shared_ptr<GridCell> position) {
-  _previousPosition = position;
-}
+// void Agent::setPreviousPosition(std::shared_ptr<GridCell> position) {
+//   _previousPosition = position;
+// }
 
 void Agent::setCurrentPosition(std::shared_ptr<GridCell> position) {
   _currentPosition = position;

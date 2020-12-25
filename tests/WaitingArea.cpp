@@ -68,7 +68,7 @@ void GridCell::updateCell() {
   this->_currentAgent = nullptr;
 }
 void GridCell::updateCell(std::shared_ptr<Agent> agent) {
-  agent->setPreviousPosition(this->get_shared_this()); 
+  // agent->setPreviousPosition(this->get_shared_this());
   this->_occupied = true;
   this->_currentAgent = agent;
 }
