@@ -5,6 +5,7 @@
 #include <iostream>
 #include <random>
 #include <thread>
+#include <algorithm>
 
 /*
 WaitingAgents member function definitions

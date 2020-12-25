@@ -1,6 +1,7 @@
 #include "Agent.h"
 #include <mutex>
 #include <random>
+#include <algorithm>
 
 Agent::Agent() {
   _currentPosition = nullptr;
@@ -168,7 +169,7 @@ static bool compareCells(const std::vector<int> a, const std::vector<int> b) {
   return f1 > f2;
 }
 void Agent::cellSort(std::vector<std::vector<int>> *v) {
-  sort(v->begin(), v->end(), compareCells);
+  std::sort(v->begin(), v->end(), compareCells);
 }
 
 bool Agent::checkValidCell(int x, int y) {
