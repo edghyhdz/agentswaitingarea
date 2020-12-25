@@ -62,8 +62,6 @@ bool Agent::moveToValidCell() {
   // Only to mark path that agent should follow
   this->_currentPosition->setAStarPath(_currentGrid);
 
-  // Choose where to move from calculated a* path
-
   // print should happen here
   std::this_thread::sleep_for(std::chrono::milliseconds(200));
   std::vector<std::vector<int>> grid(
@@ -147,8 +145,6 @@ bool Agent::moveToValidCell() {
         int cellID = this->_currentPosition->getX() * (y_1 + 1) -
                      (this->_currentPosition->getX() - x_1);
         validCells.push_back(cellID);
-        // next_grid_test = _cells.at(cellID);
-        // break;
       }
     }
   }
@@ -157,7 +153,7 @@ bool Agent::moveToValidCell() {
   std::random_device rd;
   std::mt19937 eng(rd());
   std::uniform_int_distribution<> distr(0, validCells.size() - 1);
-  next_grid_test = _cells.at(validCells.at(distr(eng))); 
+  next_grid_test = _cells.at(validCells.at(distr(eng)));
 
   // Choose a random cell to move
   // std::shared_ptr<GridCell> next_grid;
