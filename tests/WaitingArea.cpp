@@ -76,7 +76,6 @@ void GridCell::updateCell(std::shared_ptr<Agent> agent) {
 void GridCell::moveToCell() {}
 void GridCell::setAStarPath(std::vector<std::vector<int>> aPath){
   _aPath = aPath; 
-  std::cout << "A Star path has been set for CELL ID: " << this->getID() << std::endl; 
 }; 
 
 // Getters

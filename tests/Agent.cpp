@@ -57,16 +57,15 @@ void Agent::walk() {
 
 bool Agent::moveToValidCell() {
 
-  std::shared_ptr<GridCell> next_grid;
-  std::random_device rd;
-  std::mt19937 eng(rd());
-  std::uniform_int_distribution<> distr(0, _cells.size() - 1);
-
   this->Search();
-  // this->_previousPosition->setAStarPath(_currentGrid);
-  // this->_currentPosition->setAStarPath(_currentGrid);
+
+  // Only to mark path that agent should follow
+  this->_currentPosition->setAStarPath(_currentGrid);
+
+  // Choose where to move from calculated a* path
+
   // print should happen here
-  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  std::this_thread::sleep_for(std::chrono::milliseconds(200));
   std::vector<std::vector<int>> grid(
       this->_currentPosition->getY(),
       std::vector<int>(this->_currentPosition->getX()));
@@ -129,16 +128,44 @@ bool Agent::moveToValidCell() {
   // here
   _openList.clear();
   this->_currentPosition->updateCell();
-  next_grid = _cells.at(distr(eng));
+
+
+  std::shared_ptr<GridCell> next_grid_test;
+
+  std::tuple<int, int> coordinates = this->_currentPosition->getCoordinates();
+  int x_this = std::get<0>(coordinates);
+  int y_this = std::get<1>(coordinates);
+  for (int i = 0; i < 4; i++) {
+      int x_1 = x_this + delta[i][0];
+      int y_1 = y_this + delta[i][1];
+
+      // Check first if cells are on grid and if they 
+      // have value = 3, meaning they are found a* path
+      bool on_grid_x = (x_1 >= 0 && x_1 < this->_currentPosition->getX());
+      bool on_grid_y = (y_1 >= 0 && y_1 < this->_currentPosition->getY());
+      if (on_grid_x && on_grid_y){
+        if (_currentGrid[x_1][y_1] == 3){
+          int cellID = this->_currentPosition->getX() * (y_1 + 1) - (this->_currentPosition->getX() - x_1); 
+          next_grid_test = _cells.at(cellID); 
+          break;
+        }
+      }
+    }
+
+
+  // Choose a random cell to move
+  // std::shared_ptr<GridCell> next_grid;
+  // std::random_device rd;
+  // std::mt19937 eng(rd());
+  // std::uniform_int_distribution<> distr(0, _cells.size() - 1);
+
+
+  // next_grid = _cells.at(distr(eng));
   // Release previous cell
   // update new cell
-  next_grid->updateCell(get_shared_this());
-  this->setCurrentPosition(next_grid);
+  next_grid_test->updateCell(get_shared_this());
+  this->setCurrentPosition(next_grid_test);
 };
-
-// void Agent::setPreviousPosition(std::shared_ptr<GridCell> position) {
-//   _previousPosition = position;
-// }
 
 void Agent::setCurrentPosition(std::shared_ptr<GridCell> position) {
   _currentPosition = position;
