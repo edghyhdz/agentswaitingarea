@@ -114,7 +114,7 @@ WaitingArea::WaitingArea(int width, int height, int x_exit, int y_exit)
     : _width(width), _height(height), _y_exit(y_exit), _x_exit(x_exit) {
   // Constructs area
   this->constructArea();
-  int agentNumber = 1;
+  int agentNumber = 40;
 
   for (int i = 0; i < agentNumber; ++i) {
     // Randomly initialize agents on grid
@@ -144,7 +144,7 @@ void WaitingArea::simulate() {
   }
 
   // Print grid
-  // _threads.emplace_back(std::thread(&WaitingArea::printWaitingArea, this));
+  _threads.emplace_back(std::thread(&WaitingArea::printWaitingArea, this));
 }
 
 // Prints grid area
@@ -152,7 +152,7 @@ void WaitingArea::simulate() {
 void WaitingArea::printWaitingArea() {
   while (true) {
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     std::vector<std::vector<int>> grid(this->_height,
                                        std::vector<int>(this->_width));
     int x, y;
@@ -164,7 +164,7 @@ void WaitingArea::printWaitingArea() {
 
 
       if (cell->cellIsTaken()) {
-        std::cout << "Agent in cell id: " << cell->getID() << std::endl; 
+        // std::cout << "Agent in cell id: " << cell->getID() << std::endl; 
         for (auto &c : _cells){
           if (c->getID() == cell->getID()){
             a_path = c->getAStartPath(); 
@@ -195,18 +195,18 @@ void WaitingArea::printWaitingArea() {
     std::cout << printGrid;
     std::cout << "\n";
 
-    std::string apath_string;
-    for (auto k : a_path){
-      std::string rows; 
-      for (auto i : k){
-        rows += std::to_string(i) + ", ";
-      }
-      apath_string += rows + "\n"; 
-    }
-    std::cout << "################################################\n";
-    std::cout << "\n";
-    std::cout << apath_string;
-    std::cout << "\n";
+    // std::string apath_string;
+    // for (auto k : a_path){
+    //   std::string rows; 
+    //   for (auto i : k){
+    //     rows += std::to_string(i) + ", ";
+    //   }
+    //   apath_string += rows + "\n"; 
+    // }
+    // std::cout << "################################################\n";
+    // std::cout << "\n";
+    // std::cout << apath_string;
+    // std::cout << "\n";
 
   }
 }

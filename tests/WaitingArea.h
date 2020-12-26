@@ -68,7 +68,7 @@ private:
   int _x, _y; // widht and height from grid
   int _x_goal, _y_goal; // end goal coordinates
   std::tuple<int, int> _coords; // grid cell coordinates
-  WaitingAgents _waitingAgents;
+  WaitingAgents _waitingAgents; // List of waiting agents to move into cell
   bool _occupied;
   std::shared_ptr<Agent> _currentAgent; // Current agent on cell;
   std::vector<std::vector<int>> _aPath; 

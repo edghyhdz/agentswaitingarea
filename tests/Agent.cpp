@@ -64,73 +64,73 @@ bool Agent::moveToValidCell() {
 
   // print should happen here
   std::this_thread::sleep_for(std::chrono::milliseconds(200));
-  std::vector<std::vector<int>> grid(
-      this->_currentPosition->getY(),
-      std::vector<int>(this->_currentPosition->getX()));
+  // std::vector<std::vector<int>> grid(
+  //     this->_currentPosition->getY(),
+  //     std::vector<int>(this->_currentPosition->getX()));
 
-  for (auto &cell : _cells) {
-    std::tuple<int, int> tmp = cell->getCoordinates();
-    int x_init = std::get<0>(tmp);
-    int y_init = std::get<1>(tmp);
+  // for (auto &cell : _cells) {
+  //   std::tuple<int, int> tmp = cell->getCoordinates();
+  //   int x_init = std::get<0>(tmp);
+  //   int y_init = std::get<1>(tmp);
 
-    if (cell->cellIsTaken()) {
-      grid[y_init][x_init] = 1;
-    } else {
-      grid[y_init][x_init] = 0;
-    }
-  }
-  std::string printGrid;
-  for (auto k : grid) {
-    std::string row;
-    for (auto l : k) {
-      if (l == 0) {
-        row += "· ";
-      } else if (l == 1) {
-        row += "A ";
-      }
-    }
-    printGrid += row + "\n";
-  }
-  std::cout << "\033[42;31mbold red text\033[0m\n";
+  //   if (cell->cellIsTaken()) {
+  //     grid[y_init][x_init] = 1;
+  //   } else {
+  //     grid[y_init][x_init] = 0;
+  //   }
+  // }
+  // std::string printGrid;
+  // for (auto k : grid) {
+  //   std::string row;
+  //   for (auto l : k) {
+  //     if (l == 0) {
+  //       row += "· ";
+  //     } else if (l == 1) {
+  //       row += "A ";
+  //     }
+  //   }
+  //   printGrid += row + "\n";
+  // }
+  // std::cout << "\033[42;31mbold red text\033[0m\n";
 
-  std::cout << "################################################\n";
-  std::cout << "\n";
-  std::cout << printGrid;
-  std::cout << "\n";
+  // std::cout << "################################################\n";
+  // std::cout << "\n";
+  // std::cout << printGrid;
+  // std::cout << "\n";
 
-  std::tuple<int, int> tmp = this->_currentPosition->getCoordinates();
-  int x_init = std::get<0>(tmp);
-  int y_init = std::get<1>(tmp);
+  // std::tuple<int, int> tmp = this->_currentPosition->getCoordinates();
+  // int x_init = std::get<0>(tmp);
+  // int y_init = std::get<1>(tmp);
 
-  std::string aPathString;
-  for (int i = 0; i < _currentGrid[0].size(); i++) {
-    std::string rows;
-    for (int k = 0; k < _currentGrid.size(); k++) {
-      if (x_init == k && y_init == i) {
-        rows += "A ";
-      } else if (_currentGrid[k][i] == 3) {
-        rows += "x ";
-      } else {
-        rows += "· ";
-      }
-    }
-    aPathString += rows + "\n";
-  }
-  std::cout << "################################################\n";
-  std::cout << "\n";
-  std::cout << aPathString;
-  std::cout << "\n";
+  // std::string aPathString;
+  // for (int i = 0; i < _currentGrid[0].size(); i++) {
+  //   std::string rows;
+  //   for (int k = 0; k < _currentGrid.size(); k++) {
+  //     if (x_init == k && y_init == i) {
+  //       rows += "A ";
+  //     } else if (_currentGrid[k][i] == 3) {
+  //       rows += "x ";
+  //     } else {
+  //       rows += "· ";
+  //     }
+  //   }
+  //   aPathString += rows + "\n";
+  // }
+  // std::cout << "################################################\n";
+  // std::cout << "\n";
+  // std::cout << aPathString;
+  // std::cout << "\n";
 
   // here
   _openList.clear();
   this->_currentPosition->updateCell();
 
-  std::shared_ptr<GridCell> next_grid_test;
+  std::shared_ptr<GridCell> nextGrid;
 
   std::tuple<int, int> coordinates = this->_currentPosition->getCoordinates();
   int x_this = std::get<0>(coordinates);
   int y_this = std::get<1>(coordinates);
-
+  bool foundCell = false;
   std::vector<int> validCells;
   for (int i = 0; i < 4; i++) {
     int x_1 = x_this + delta[i][0];
@@ -142,6 +142,7 @@ bool Agent::moveToValidCell() {
     bool on_grid_y = (y_1 >= 0 && y_1 < this->_currentPosition->getY());
     if (on_grid_x && on_grid_y) {
       if (_currentGrid[x_1][y_1] == 3) {
+        foundCell = true;
         int cellID = this->_currentPosition->getX() * (y_1 + 1) -
                      (this->_currentPosition->getX() - x_1);
         validCells.push_back(cellID);
@@ -150,22 +151,16 @@ bool Agent::moveToValidCell() {
   }
 
   // Choose next cell randomly from validCells vector
-  std::random_device rd;
-  std::mt19937 eng(rd());
-  std::uniform_int_distribution<> distr(0, validCells.size() - 1);
-  next_grid_test = _cells.at(validCells.at(distr(eng)));
+  // Only if we have not arrived yet to destination
+  if (foundCell) {
+    std::random_device rd;
+    std::mt19937 eng(rd());
+    std::uniform_int_distribution<> distr(0, validCells.size() - 1);
+    nextGrid = _cells.at(validCells.at(distr(eng)));
 
-  // Choose a random cell to move
-  // std::shared_ptr<GridCell> next_grid;
-  // std::random_device rd;
-  // std::mt19937 eng(rd());
-  // std::uniform_int_distribution<> distr(0, _cells.size() - 1);
-
-  // next_grid = _cells.at(distr(eng));
-  // Release previous cell
-  // update new cell
-  next_grid_test->updateCell(get_shared_this());
-  this->setCurrentPosition(next_grid_test);
+    nextGrid->updateCell(get_shared_this());
+    this->setCurrentPosition(nextGrid);
+  }
 };
 
 void Agent::setCurrentPosition(std::shared_ptr<GridCell> position) {
@@ -272,3 +267,13 @@ void Agent::Search() {
     this->expandNeighbors(current);
   }
 }
+
+/*
+TODO: 
+Agents can also decide to move somewhere else, if so then they need to update _waitingList accordingly
+- Agents should just move once they are given clearance to move into cell that is busy at the moment
+- Boundary conditions -> where agents spawn from
+  - Agents will only spawn if boundary condition is free -> _waitingList boundary or so
+- Print board 
+  - Use ncursor or so in order not to print all times into console
+*/
