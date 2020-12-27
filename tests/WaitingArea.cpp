@@ -1,11 +1,11 @@
 #include "WaitingArea.h"
 #include "Agent.h"
+#include <algorithm>
 #include <chrono>
 #include <future>
 #include <iostream>
 #include <random>
 #include <thread>
-#include <algorithm>
 
 /*
 WaitingAgents member function definitions
@@ -63,7 +63,7 @@ void GridCell::calculateCoordinates() {
 
 // Used only to unlock cell
 void GridCell::updateCell() {
-  // this->_aPath.clear(); 
+  // this->_aPath.clear();
   this->_occupied = false;
   this->_currentAgent = nullptr;
 }
@@ -73,10 +73,22 @@ void GridCell::updateCell(std::shared_ptr<Agent> agent) {
   this->_currentAgent = agent;
 }
 
+void GridCell::addAgentToQueue(std::shared_ptr<Agent> agent) {
+  std::promise<void> prms;
+  std::future<void> ftr = prms.get_future(); 
+  _waitingAgents.pushBack(agent, std::move(prms)); 
+
+  std::cout << "Added agent to exit queue\n"; 
+  
+  // Wait until agent is allowed to enter
+  ftr.wait(); 
+
+}
+
 void GridCell::moveToCell() {}
-void GridCell::setAStarPath(std::vector<std::vector<int>> aPath){
-  _aPath = aPath; 
-}; 
+void GridCell::setAStarPath(std::vector<std::vector<int>> aPath) {
+  _aPath = aPath;
+};
 
 // Getters
 std::tuple<int, int> GridCell::getCoordinates() { return {this->_coords}; }
@@ -89,8 +101,8 @@ void WaitingArea::constructArea() {
   for (int k = 0; k < this->_height; k++) {
     std::string rows;
     for (int i = 0; i < this->_width; i++) {
-      this->_cells.push_back(
-          std::move(std::make_shared<GridCell>(id, _width, _height, _x_exit, _y_exit)));
+      this->_cells.push_back(std::move(
+          std::make_shared<GridCell>(id, _width, _height, _x_exit, _y_exit)));
       id++;
       auto temp = this->_cells.back();
       std::tuple<int, int> temp_coords = temp->getCoordinates();
@@ -114,7 +126,7 @@ WaitingArea::WaitingArea(int width, int height, int x_exit, int y_exit)
     : _width(width), _height(height), _y_exit(y_exit), _x_exit(x_exit) {
   // Constructs area
   this->constructArea();
-  int agentNumber = 40;
+  int agentNumber = 5;
 
   for (int i = 0; i < agentNumber; ++i) {
     // Randomly initialize agents on grid
@@ -123,8 +135,8 @@ WaitingArea::WaitingArea(int width, int height, int x_exit, int y_exit)
     std::mt19937 eng(rd());
     std::uniform_int_distribution<> distr(0, _cells.size() - 1);
     init_grid = _cells.at(distr(eng));
-    std::shared_ptr<Agent> agent = std::make_shared<Agent>(init_grid, _cells); 
-    init_grid->updateCell(agent); 
+    std::shared_ptr<Agent> agent = std::make_shared<Agent>(init_grid, _cells);
+    init_grid->updateCell(agent);
     _agents.emplace_back(agent);
   }
 }
@@ -156,26 +168,28 @@ void WaitingArea::printWaitingArea() {
     std::vector<std::vector<int>> grid(this->_height,
                                        std::vector<int>(this->_width));
     int x, y;
-    std::vector<std::vector<int>> a_path; 
+    std::vector<std::vector<int>> a_path;
     for (auto &cell : _cells) {
       std::tuple<int, int> tmp = cell->getCoordinates();
       x = std::get<0>(tmp);
       y = std::get<1>(tmp);
 
-
       if (cell->cellIsTaken()) {
-        // std::cout << "Agent in cell id: " << cell->getID() << std::endl; 
-        for (auto &c : _cells){
-          if (c->getID() == cell->getID()){
-            a_path = c->getAStartPath(); 
+        // std::cout << "Agent in cell id: " << cell->getID() << std::endl;
+        for (auto &c : _cells) {
+          if (c->getID() == cell->getID()) {
+            a_path = c->getAStartPath();
           }
         }
-
         grid[y][x] = 1;
-      } else {
+      } else if (y == this->_height - 1 && x == this->_width -1 ){
+        grid[y][x] = 2;
+      }
+      else {
         grid[y][x] = 0;
       }
     }
+    int colorCode = 30; 
     std::string printGrid;
     for (auto k : grid) {
       std::string row;
@@ -183,13 +197,16 @@ void WaitingArea::printWaitingArea() {
         if (l == 0) {
           row += "· ";
         } else if (l == 1){
-          row += "A ";
+          // row += "A ";
+          row += "\033[1;"+ std::to_string(colorCode) + "mA \033[0m";
+          colorCode++; 
+        }
+        else if (l == 2) {
+          row += "\033[1;31mX \033[0m";
         }
       }
       printGrid += row + "\n";
     }
-    std::cout << "\033[42;31mbold red text\033[0m\n";
-
     std::cout << "################################################\n";
     std::cout << "\n";
     std::cout << printGrid;
@@ -197,17 +214,16 @@ void WaitingArea::printWaitingArea() {
 
     // std::string apath_string;
     // for (auto k : a_path){
-    //   std::string rows; 
+    //   std::string rows;
     //   for (auto i : k){
     //     rows += std::to_string(i) + ", ";
     //   }
-    //   apath_string += rows + "\n"; 
+    //   apath_string += rows + "\n";
     // }
     // std::cout << "################################################\n";
     // std::cout << "\n";
     // std::cout << apath_string;
     // std::cout << "\n";
-
   }
 }
 

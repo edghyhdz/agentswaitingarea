@@ -123,7 +123,7 @@ bool Agent::moveToValidCell() {
 
   // here
   _openList.clear();
-  this->_currentPosition->updateCell();
+  
 
   std::shared_ptr<GridCell> nextGrid;
 
@@ -131,6 +131,7 @@ bool Agent::moveToValidCell() {
   int x_this = std::get<0>(coordinates);
   int y_this = std::get<1>(coordinates);
   bool foundCell = false;
+  bool arrivedDestination = false; 
   std::vector<int> validCells;
   for (int i = 0; i < 4; i++) {
     int x_1 = x_this + delta[i][0];
@@ -147,6 +148,12 @@ bool Agent::moveToValidCell() {
                      (this->_currentPosition->getX() - x_1);
         validCells.push_back(cellID);
       }
+      else if (_currentGrid[x_1][y_1] == 5) {
+        arrivedDestination == true; 
+        // Put cell back again until granted access
+        std::cout << "Agents waiting for access\n"; 
+        this->_currentPosition->addAgentToQueue(this->get_shared_this()); 
+      }
     }
   }
 
@@ -158,8 +165,30 @@ bool Agent::moveToValidCell() {
     std::uniform_int_distribution<> distr(0, validCells.size() - 1);
     nextGrid = _cells.at(validCells.at(distr(eng)));
 
+    std::tuple<int, int> nextGridCoords = nextGrid->getCoordinates();
+    int x_next = std::get<0>(nextGridCoords);
+    int y_next = std::get<1>(nextGridCoords);
+
+    // if (x_next == this->_currentPosition->getXGoal() - 1 &&
+    //     y_next == this->_currentPosition->getYGoal() - 1) {
+    //   std::cout << "Arrived at destination :-)\n";
+    // } else {
+    //   std::cout << "Goal coords: (" << this->_currentPosition->getXGoal() - 1
+    //             << ", " << this->_currentPosition->getYGoal() - 1 << ")"
+    //             << std::endl;
+    //   std::cout << "Cell id: " << this->_currentPosition->getID();
+    //   std::cout << "Next coords: (" << x_next << ", " << y_next << ")"
+    //             << std::endl;
+    // }
+    // Remove current cell's agent
+    this->_currentPosition->updateCell();
+    // Update next grid cell with agent 
     nextGrid->updateCell(get_shared_this());
     this->setCurrentPosition(nextGrid);
+  }
+  else if (arrivedDestination){
+    std::cout << "Arrived to destination\n ask for permission to enter"; 
+    // this->_currentPosition->updateCell(); 
   }
 };
 
@@ -269,11 +298,14 @@ void Agent::Search() {
 }
 
 /*
-TODO: 
-Agents can also decide to move somewhere else, if so then they need to update _waitingList accordingly
-- Agents should just move once they are given clearance to move into cell that is busy at the moment
+TODO:
+Agents can also decide to move somewhere else, if so then they need to update
+_waitingList accordingly
+- Agents should just move once they are given clearance to move into cell that
+is busy at the moment
 - Boundary conditions -> where agents spawn from
-  - Agents will only spawn if boundary condition is free -> _waitingList boundary or so
-- Print board 
+  - Agents will only spawn if boundary condition is free -> _waitingList
+boundary or so
+- Print board
   - Use ncursor or so in order not to print all times into console
 */

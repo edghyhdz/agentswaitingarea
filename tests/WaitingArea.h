@@ -46,6 +46,7 @@ public:
   void calculateCoordinates();
   void updateCell();
   void updateCell(std::shared_ptr<Agent> agent); 
+  void addAgentToQueue(std::shared_ptr<Agent> agent); 
   bool cellIsTaken() { return _occupied; }
   void moveToCell();
   int getID() { return _id; }
