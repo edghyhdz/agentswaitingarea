@@ -15,6 +15,7 @@ Agent::Agent(std::shared_ptr<GridCell> position,
             << std::get<0>(position->getCoordinates()) << ", "
             << std::get<1>(position->getCoordinates()) << ")" << std::endl;
   _cells = cells;
+  _arrivedDestination = false; 
   _currentPosition = position;
   _speed = 0.5;
 }
@@ -30,7 +31,7 @@ void Agent::walk() {
   bool hasEnteredCellGrid = false;
 
   // Update every 1 sec
-  double cycleDuration = 500;
+  double cycleDuration = 1000;
   std::chrono::time_point<std::chrono::system_clock> lastUpdate;
 
   lastUpdate = std::chrono::system_clock::now();
@@ -45,85 +46,29 @@ void Agent::walk() {
             .count();
 
     if (timeSinceLastUpdate >= cycleDuration) {
-      // Agent should
-      // std::vector<std::vector<int>> search_query = this->Search();
-      // _openList.clear();
-
       this->moveToValidCell();
       lastUpdate = std::chrono::system_clock::now();
     }
   }
 }
 
-bool Agent::moveToValidCell() {
+// Checks if there is an agent already in that cell to move to
+bool Agent::checkAgentInCell(){
+  
+}
+
+
+void Agent::moveToValidCell() {
 
   this->Search();
 
   // Only to mark path that agent should follow
   this->_currentPosition->setAStarPath(_currentGrid);
 
-  // print should happen here
-  std::this_thread::sleep_for(std::chrono::milliseconds(200));
-  // std::vector<std::vector<int>> grid(
-  //     this->_currentPosition->getY(),
-  //     std::vector<int>(this->_currentPosition->getX()));
-
-  // for (auto &cell : _cells) {
-  //   std::tuple<int, int> tmp = cell->getCoordinates();
-  //   int x_init = std::get<0>(tmp);
-  //   int y_init = std::get<1>(tmp);
-
-  //   if (cell->cellIsTaken()) {
-  //     grid[y_init][x_init] = 1;
-  //   } else {
-  //     grid[y_init][x_init] = 0;
-  //   }
-  // }
-  // std::string printGrid;
-  // for (auto k : grid) {
-  //   std::string row;
-  //   for (auto l : k) {
-  //     if (l == 0) {
-  //       row += "· ";
-  //     } else if (l == 1) {
-  //       row += "A ";
-  //     }
-  //   }
-  //   printGrid += row + "\n";
-  // }
-  // std::cout << "\033[42;31mbold red text\033[0m\n";
-
-  // std::cout << "################################################\n";
-  // std::cout << "\n";
-  // std::cout << printGrid;
-  // std::cout << "\n";
-
-  // std::tuple<int, int> tmp = this->_currentPosition->getCoordinates();
-  // int x_init = std::get<0>(tmp);
-  // int y_init = std::get<1>(tmp);
-
-  // std::string aPathString;
-  // for (int i = 0; i < _currentGrid[0].size(); i++) {
-  //   std::string rows;
-  //   for (int k = 0; k < _currentGrid.size(); k++) {
-  //     if (x_init == k && y_init == i) {
-  //       rows += "A ";
-  //     } else if (_currentGrid[k][i] == 3) {
-  //       rows += "x ";
-  //     } else {
-  //       rows += "· ";
-  //     }
-  //   }
-  //   aPathString += rows + "\n";
-  // }
-  // std::cout << "################################################\n";
-  // std::cout << "\n";
-  // std::cout << aPathString;
-  // std::cout << "\n";
+  std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
   // here
   _openList.clear();
-  
 
   std::shared_ptr<GridCell> nextGrid;
 
@@ -131,7 +76,6 @@ bool Agent::moveToValidCell() {
   int x_this = std::get<0>(coordinates);
   int y_this = std::get<1>(coordinates);
   bool foundCell = false;
-  bool arrivedDestination = false; 
   std::vector<int> validCells;
   for (int i = 0; i < 4; i++) {
     int x_1 = x_this + delta[i][0];
@@ -148,11 +92,24 @@ bool Agent::moveToValidCell() {
                      (this->_currentPosition->getX() - x_1);
         validCells.push_back(cellID);
       }
-      else if (_currentGrid[x_1][y_1] == 5) {
-        arrivedDestination == true; 
+      else if (_currentGrid[x_1][y_1] == 5 && this->_arrivedDestination==false) {
         // Put cell back again until granted access
-        std::cout << "Agents waiting for access\n"; 
-        this->_currentPosition->addAgentToQueue(this->get_shared_this()); 
+        std::cout << "Agent arrived to destination\n"; 
+        int cellID = this->_currentPosition->getX() * (y_1 + 1) -
+                     (this->_currentPosition->getX() - x_1);
+
+        // Get exit Cell ID
+        nextGrid = _cells.at(cellID);
+        std::chrono::time_point<std::chrono::system_clock> beforeQueue;
+        beforeQueue = std::chrono::system_clock::now();
+        // Add agent to queue
+        nextGrid->addAgentToQueue(this->get_shared_this()); 
+        // After agent has been granted access update cell and move to exit
+        long afterQueue = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - beforeQueue).count(); 
+        std::cout << "Agent was granted acces after: "<< afterQueue << " miliseconds\n"; 
+        this->_currentPosition->updateCell();
+        this->arrivedToDestination(); 
+        break; 
       }
     }
   }
@@ -165,31 +122,14 @@ bool Agent::moveToValidCell() {
     std::uniform_int_distribution<> distr(0, validCells.size() - 1);
     nextGrid = _cells.at(validCells.at(distr(eng)));
 
-    std::tuple<int, int> nextGridCoords = nextGrid->getCoordinates();
-    int x_next = std::get<0>(nextGridCoords);
-    int y_next = std::get<1>(nextGridCoords);
-
-    // if (x_next == this->_currentPosition->getXGoal() - 1 &&
-    //     y_next == this->_currentPosition->getYGoal() - 1) {
-    //   std::cout << "Arrived at destination :-)\n";
-    // } else {
-    //   std::cout << "Goal coords: (" << this->_currentPosition->getXGoal() - 1
-    //             << ", " << this->_currentPosition->getYGoal() - 1 << ")"
-    //             << std::endl;
-    //   std::cout << "Cell id: " << this->_currentPosition->getID();
-    //   std::cout << "Next coords: (" << x_next << ", " << y_next << ")"
-    //             << std::endl;
-    // }
+    nextGrid->addAgentToQueue(this->get_shared_this()); 
     // Remove current cell's agent
     this->_currentPosition->updateCell();
     // Update next grid cell with agent 
-    nextGrid->updateCell(get_shared_this());
+    nextGrid->updateCell(this->get_shared_this());
     this->setCurrentPosition(nextGrid);
   }
-  else if (arrivedDestination){
-    std::cout << "Arrived to destination\n ask for permission to enter"; 
-    // this->_currentPosition->updateCell(); 
-  }
+
 };
 
 void Agent::setCurrentPosition(std::shared_ptr<GridCell> position) {

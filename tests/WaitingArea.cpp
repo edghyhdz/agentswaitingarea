@@ -12,7 +12,7 @@ WaitingAgents member function definitions
 */
 // .size method including lock_guard
 int WaitingAgents::getSize() {
-  std::lock_guard<std::mutex> locck(_mutex);
+  std::lock_guard<std::mutex> lock(_mutex);
   return _agents.size();
 }
 
@@ -27,6 +27,7 @@ void WaitingAgents::pushBack(std::shared_ptr<Agent> agent,
 // Permit entry to agent that has waited longer
 void WaitingAgents::permitEntryToFirstInQueue() {
   std::lock_guard<std::mutex> lock(_mutex);
+  // std::cout << "Agent was granted acces\n"; 
 
   // get entries from the front of both queues
   auto firstPromise = _promises.begin();
@@ -37,8 +38,9 @@ void WaitingAgents::permitEntryToFirstInQueue() {
   firstPromise->set_value();
 
   // remove front elements from both queues
-  _agents.erase(firstAgent);
-  _promises.erase(firstPromise);
+  this->_agents.erase(firstAgent);
+  this->_promises.erase(firstPromise);
+
 }
 
 /*
@@ -78,11 +80,22 @@ void GridCell::addAgentToQueue(std::shared_ptr<Agent> agent) {
   std::future<void> ftr = prms.get_future(); 
   _waitingAgents.pushBack(agent, std::move(prms)); 
 
-  std::cout << "Added agent to exit queue\n"; 
-  
+  // std::cout << "Added agent to exit queue\n"; 
   // Wait until agent is allowed to enter
   ftr.wait(); 
 
+}
+
+void GridCell::processAgentQueue(){
+  
+  while (true){
+    std::this_thread::sleep_for(std::chrono::milliseconds(1)); 
+
+    if (this->_waitingAgents.getSize() > 0 && this->_occupied == false){
+      // std::cout << "Agents waiting: " << _waitingAgents.getSize() << std::endl; 
+      _waitingAgents.permitEntryToFirstInQueue(); 
+    }
+  }
 }
 
 void GridCell::moveToCell() {}
@@ -107,9 +120,13 @@ void WaitingArea::constructArea() {
       auto temp = this->_cells.back();
       std::tuple<int, int> temp_coords = temp->getCoordinates();
       ;
+      // Launch thread to permit entry to exit
+      _threads.emplace_back(std::thread(&GridCell::processAgentQueue, temp)); 
       if (_x_exit - 1 == i && _y_exit - 1 == k) {
         rows += "(" + std::to_string(std::get<0>(temp->getCoordinates())) +
                 ", " + std::to_string(std::get<1>(temp_coords)) + ") ";
+        // Launch thread to permit entry to exit
+        // _threads.emplace_back(std::thread(&GridCell::processAgentQueue, temp)); 
         // rows += " X";
       } else {
         rows += "(" + std::to_string(std::get<0>(temp->getCoordinates())) +
@@ -134,7 +151,8 @@ WaitingArea::WaitingArea(int width, int height, int x_exit, int y_exit)
     std::random_device rd;
     std::mt19937 eng(rd());
     std::uniform_int_distribution<> distr(0, _cells.size() - 1);
-    init_grid = _cells.at(distr(eng));
+    // init_grid = _cells.at(distr(eng));
+    init_grid = _cells.at(i); 
     std::shared_ptr<Agent> agent = std::make_shared<Agent>(init_grid, _cells);
     init_grid->updateCell(agent);
     _agents.emplace_back(agent);
@@ -164,7 +182,7 @@ void WaitingArea::simulate() {
 void WaitingArea::printWaitingArea() {
   while (true) {
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     std::vector<std::vector<int>> grid(this->_height,
                                        std::vector<int>(this->_width));
     int x, y;

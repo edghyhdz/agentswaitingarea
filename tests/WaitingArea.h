@@ -50,6 +50,7 @@ public:
   bool cellIsTaken() { return _occupied; }
   void moveToCell();
   int getID() { return _id; }
+  void processAgentQueue(); 
 
   int getX() { return _x; }
   int getY() { return _y; }

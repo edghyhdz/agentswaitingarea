@@ -17,10 +17,13 @@ public:
   Agent(std::shared_ptr<GridCell> currentPosition, std::vector<std::shared_ptr<GridCell>> &cells); 
   void setCurrentPosition(std::shared_ptr<GridCell> position);
   void walk();
-  bool moveToValidCell();
+  void moveToValidCell();
+  bool checkAgentInCell(); 
+  
   void calculatePath();  
   void setGridCells(std::vector<std::shared_ptr<GridCell>> cells); 
   void setCurrentGrid();
+  void arrivedToDestination(){ _arrivedDestination=true; }
   // void setPreviousPosition(std::shared_ptr<GridCell> position);
   std::shared_ptr<Agent> get_shared_this() { return shared_from_this(); }
 
@@ -42,6 +45,7 @@ private:
   std::vector<std::shared_ptr<GridCell>> _cells;
   std::vector<std::vector<int>> _openList; 
   std::vector<std::vector<int>> _currentGrid; 
+  bool _arrivedDestination; 
 };
 
 #endif
