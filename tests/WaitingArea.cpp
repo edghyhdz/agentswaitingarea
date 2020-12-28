@@ -143,19 +143,32 @@ WaitingArea::WaitingArea(int width, int height, int x_exit, int y_exit)
     : _width(width), _height(height), _y_exit(y_exit), _x_exit(x_exit) {
   // Constructs area
   this->constructArea();
-  int agentNumber = 5;
-
+  int agentNumber = 20;
+  std::vector<int> randVector; 
   for (int i = 0; i < agentNumber; ++i) {
     // Randomly initialize agents on grid
     std::shared_ptr<GridCell> init_grid;
     std::random_device rd;
     std::mt19937 eng(rd());
     std::uniform_int_distribution<> distr(0, _cells.size() - 1);
-    // init_grid = _cells.at(distr(eng));
-    init_grid = _cells.at(i); 
+    int randNumber = distr(eng); 
+
+    init_grid = _cells.at(0);
+    // init_grid = _cells.at(i); 
     std::shared_ptr<Agent> agent = std::make_shared<Agent>(init_grid, _cells);
     init_grid->updateCell(agent);
     _agents.emplace_back(agent);
+
+    // if (!(std::count(randVector.begin(), randVector.end(), randNumber))){
+    //   init_grid = _cells.at(randNumber);
+    //   // init_grid = _cells.at(i); 
+    //   std::shared_ptr<Agent> agent = std::make_shared<Agent>(init_grid, _cells);
+    //   init_grid->updateCell(agent);
+    //   _agents.emplace_back(agent);
+
+    //   // add to randVector so that position is not reppeated again
+    //   randVector.push_back(randNumber); 
+    // }
   }
 }
 
@@ -182,7 +195,7 @@ void WaitingArea::simulate() {
 void WaitingArea::printWaitingArea() {
   while (true) {
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
     std::vector<std::vector<int>> grid(this->_height,
                                        std::vector<int>(this->_width));
     int x, y;
