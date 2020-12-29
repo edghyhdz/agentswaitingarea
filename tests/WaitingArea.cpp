@@ -138,10 +138,16 @@ void WaitingArea::constructArea() {
   }
 }
 
+void WaitingArea::openDoor(bool open){
+  (*this->_openDoors) = open; 
+}
+
 // Constructor
 WaitingArea::WaitingArea(int width, int height, int x_exit, int y_exit)
     : _width(width), _height(height), _y_exit(y_exit), _x_exit(x_exit) {
   // Constructs area
+  this->_openDoors = std::make_shared<bool>(false); 
+
   this->constructArea();
   int agentNumber = 20;
   std::vector<int> randVector; 
@@ -155,7 +161,7 @@ WaitingArea::WaitingArea(int width, int height, int x_exit, int y_exit)
 
     init_grid = _cells.at(0);
     // init_grid = _cells.at(i); 
-    std::shared_ptr<Agent> agent = std::make_shared<Agent>(init_grid, _cells);
+    std::shared_ptr<Agent> agent = std::make_shared<Agent>(init_grid, _cells, _openDoors);
     init_grid->updateCell(agent);
     _agents.emplace_back(agent);
 
@@ -193,7 +199,23 @@ void WaitingArea::simulate() {
 // Prints grid area
 // void WaitingArea::printWaitingArea() { std::cout << _grid; }
 void WaitingArea::printWaitingArea() {
+
+  // Simulation starting time (approx)
+  std::chrono::time_point<std::chrono::system_clock> simStart;
+  simStart = std::chrono::system_clock::now();
+  bool doorsAreOpen = false; 
   while (true) {
+
+    long runningSim =
+        std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::system_clock::now() - simStart)
+            .count();
+
+    // Seconds until train doors are open
+    if (runningSim >= 20000 && doorsAreOpen == false) {
+      this->openDoor(true); 
+      doorsAreOpen = true; 
+    }
 
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
     std::vector<std::vector<int>> grid(this->_height,

@@ -9,11 +9,12 @@ Agent::Agent() {
 }
 
 Agent::Agent(std::shared_ptr<GridCell> position,
-             std::vector<std::shared_ptr<GridCell>> &cells) {
+             std::vector<std::shared_ptr<GridCell>> &cells, std::shared_ptr<bool> &openDoor) {
   std::cout << "Initialized agent with current position id: "
             << position->getID() << ". Coords: ("
             << std::get<0>(position->getCoordinates()) << ", "
             << std::get<1>(position->getCoordinates()) << ")" << std::endl;
+  _openDoor = openDoor; 
   _cells = cells;
   _arrivedDestination = false; 
   _currentPosition = position;
@@ -92,7 +93,7 @@ void Agent::moveToValidCell() {
                      (this->_currentPosition->getX() - x_1);
         validCells.push_back(cellID);
       }
-      else if (_currentGrid[x_1][y_1] == 5 && this->_arrivedDestination==false) {
+      else if (_currentGrid[x_1][y_1] == 5 && this->_arrivedDestination==false && (*this->_openDoor)==true) {
         // Put cell back again until granted access
         std::cout << "Agent arrived to destination\n"; 
         int cellID = this->_currentPosition->getX() * (y_1 + 1) -

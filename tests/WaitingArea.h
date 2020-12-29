@@ -87,6 +87,7 @@ public:
   WaitingArea(WaitingArea &&o) = default;
   // Creates waiting area
   void constructArea();
+  void openDoor(bool open); 
   // Prints waiting area
   void printWaitingArea();
   void printAddresses();
@@ -98,6 +99,7 @@ private:
   int _y_exit;
   int _x_exit;
   std::vector<std::shared_ptr<GridCell>> _cells;
+  std::shared_ptr<bool> _openDoors; 
   std::vector<std::shared_ptr<Agent>> _agents;
   std::string _grid;
   std::vector<std::thread> _threads;

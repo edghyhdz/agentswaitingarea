@@ -14,7 +14,7 @@ Agent class declaration
 class Agent : public std::enable_shared_from_this<Agent> {
 public:
   Agent();
-  Agent(std::shared_ptr<GridCell> currentPosition, std::vector<std::shared_ptr<GridCell>> &cells); 
+  Agent(std::shared_ptr<GridCell> currentPosition, std::vector<std::shared_ptr<GridCell>> &cells, std::shared_ptr<bool> &openDoor); 
   void setCurrentPosition(std::shared_ptr<GridCell> position);
   void walk();
   void moveToValidCell();
@@ -46,6 +46,7 @@ private:
   std::vector<std::vector<int>> _openList; 
   std::vector<std::vector<int>> _currentGrid; 
   bool _arrivedDestination; 
+  std::shared_ptr<bool> _openDoor; 
 };
 
 #endif
