@@ -47,22 +47,28 @@ void NCursesDisplay::DisplaySystem(
     doorsOpenMessage = "Train has arrived bitches!"; 
   }
 
+  int totalAgents = 0; 
+  for (auto cell : waitingArea->getGridVector()){
+    if (cell->cellIsTaken()){
+      totalAgents++; 
+    }
+  }
 
   std::string testString = "x"; 
   mvwprintw(window, ++row, 2, ("Status: " + doorsOpenMessage).c_str());
-  mvwprintw(window, ++row, 2, ("Agents in waiting area: " + to_string(agents.size())).c_str());
-  mvwprintw(window, ++row, 2, "CPU: ");
+  mvwprintw(window, ++row, 2, ("Agents simulated: " + to_string(agents.size())).c_str());
+  mvwprintw(window, ++row, 2, ("Agents in waiting area: " + to_string(totalAgents)).c_str()); 
   wattron(window, COLOR_PAIR(2));
   mvwprintw(window, row, 10, "");
-  wprintw(window, ProgressBar(50.0).c_str());
+  wprintw(window, ProgressBar(0.50).c_str());
   wattroff(window, COLOR_PAIR(2));
   mvwprintw(window, ++row, 2, "Memory: ");
   wattron(window, COLOR_PAIR(2));
   mvwprintw(window, row, 10, "");
-  wprintw(window, ProgressBar(50.0).c_str());
+  wprintw(window, ProgressBar(0.50).c_str());
   wattroff(window, COLOR_PAIR(2));
   mvwprintw(window, ++row, 2,
-            ("Total Processes: " + to_string(30)).c_str());
+            ("Agents in waiting area: " + to_string(totalAgents)).c_str()); 
   mvwprintw(
       window, ++row, 2,
       ("Running Processes: " + to_string(40)).c_str());
@@ -82,21 +88,11 @@ void NCursesDisplay::DisplayProcesses(
 
   int row{0};
   int const pid_column{2};
-  int const user_column{9};
-  int const cpu_column{16};
-  int const ram_column{26};
-  int const time_column{35};
-  int const command_column{46};
   // Modified due to issues not updating properyl
   // Reference https://knowledge.udacity.com/questions/160777
   // wclear(window);
   wattron(window, COLOR_PAIR(2));
-  mvwprintw(window, ++row, pid_column, "PID");
-  mvwprintw(window, row, user_column, "USER");
-  mvwprintw(window, row, cpu_column, "CPU[%%]");
-  mvwprintw(window, row, ram_column, "RAM[MB]");
-  mvwprintw(window, row, time_column, "TIME+");
-  mvwprintw(window, row, command_column, "COMMAND");
+  mvwprintw(window, ++row, pid_column, "WAITING AREA SIMULATION");
   wattroff(window, COLOR_PAIR(2));
 
   int rowCounter = 3; 
@@ -128,6 +124,21 @@ void NCursesDisplay::DisplayProcesses(
   }
 }
 
+void NCursesDisplay::DisplayProcessesTest(WINDOW *window, int n){
+  // wclear(window);
+  std:string placeHString = "*";  
+
+  int row{0};
+  int const pid_column{2};
+
+  // Modified due to issues not updating properyl
+  // Reference https://knowledge.udacity.com/questions/160777
+  // wclear(window);
+  wattron(window, COLOR_PAIR(2));
+  mvwprintw(window, ++row, pid_column, "GRAPH STUFF");
+  wattroff(window, COLOR_PAIR(2));
+}
+
 void NCursesDisplay::Display(std::shared_ptr<WaitingArea> waitingArea, int n) {
   initscr();      // start ncurses
   noecho();       // do not print input values
@@ -136,9 +147,11 @@ void NCursesDisplay::Display(std::shared_ptr<WaitingArea> waitingArea, int n) {
 
   int x_max{getmaxx(stdscr)};
   WINDOW* system_window = newwin(9, x_max - 1, 0, 0);
-  WINDOW* process_window =
-      newwin(3 + n, x_max - 1, system_window->_maxy + 1, 0);
-    
+  WINDOW *process_window =
+      newwin(3 + n, x_max - x_max / 2 - 1, system_window->_maxy + 1, 0);
+  WINDOW *graph_window =
+      newwin(3 + n, x_max - x_max / 2, system_window->_maxy + 1, x_max / 2 - 1);
+
   // start simulation
   waitingArea->simulate(); 
   
@@ -162,12 +175,17 @@ void NCursesDisplay::Display(std::shared_ptr<WaitingArea> waitingArea, int n) {
     init_pair(6, COLOR_MAGENTA, COLOR_BLACK);
     init_pair(7, COLOR_GREEN, COLOR_WHITE); 
     wclear(process_window);
+    wclear(system_window); 
     box(system_window, 0, 0);
     box(process_window, 0, 0);
+    box(graph_window, 0, 0);
     DisplaySystem(system_window, doorsAreOpen, waitingTime, runSim, waitingArea); 
     DisplayProcesses(process_window, waitingArea, n, doorsAreOpen, waitingTime, simStart); 
+    DisplayProcessesTest(graph_window, n); 
+
     wrefresh(system_window);
     wrefresh(process_window);
+    wrefresh(graph_window); 
     refresh();
     std::this_thread::sleep_for(std::chrono::milliseconds(300));
   }
