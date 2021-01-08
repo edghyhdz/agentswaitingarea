@@ -68,6 +68,9 @@ bool Agent::checkAgentInCell(){
   
 }
 
+void Agent::setAStarPath(std::vector<std::vector<int>> currentGrid){
+  this->_aStarPath = _currentGrid; 
+}
 
 void Agent::moveToValidCell() {
 
@@ -80,6 +83,7 @@ void Agent::moveToValidCell() {
 
   // Only to mark path that agent should follow
   this->_currentPosition->setAStarPath(_currentGrid);
+  this->setAStarPath( _currentGrid ); 
 
   std::this_thread::sleep_for(std::chrono::milliseconds(1));
 

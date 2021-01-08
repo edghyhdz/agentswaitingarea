@@ -27,6 +27,8 @@ public:
   int getUnitsUntilGoal(); 
   // void setPreviousPosition(std::shared_ptr<GridCell> position);
   std::shared_ptr<Agent> get_shared_this() { return shared_from_this(); }
+  std::vector<std::vector<int>> getAStarPath() { return _aStarPath; }
+  void setAStarPath(std::vector<std::vector<int>> currentGrid); 
 
   // Related to A* search
   // bool compareCells(const std::vector<int> a, const std::vector<int> b);
@@ -49,6 +51,7 @@ private:
   bool _arrivedDestination; 
   std::shared_ptr<bool> _openDoor; 
   int _unitsTilGoal;
+  std::vector<std::vector<int>> _aStarPath;
 };
 
 #endif
