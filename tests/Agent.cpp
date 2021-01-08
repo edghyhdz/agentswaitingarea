@@ -76,7 +76,6 @@ void Agent::moveToValidCell() {
 
   this->Search();
 
-
   if (this->_unitsTilGoal>this->getUnitsUntilGoal() && *this->_openDoor == false){
     return; 
   }
