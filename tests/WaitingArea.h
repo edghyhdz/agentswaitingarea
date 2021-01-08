@@ -84,6 +84,11 @@ public:
   ~WaitingArea();
   // Reference: https://stackoverflow.com/a/23575458/13743493
   WaitingArea(WaitingArea &&o) = default;
+
+  // Getters
+  std::vector<std::shared_ptr<GridCell>> getGridVector() { return _cells; }
+  std::vector<std::shared_ptr<Agent>> getAgentVector() { return _agents; }
+
   // Creates waiting area
   void constructArea();
   void openDoor(bool open);

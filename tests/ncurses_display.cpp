@@ -34,9 +34,11 @@ std::string NCursesDisplay::ProgressBar(float percent) {
 }
 
 void NCursesDisplay::DisplaySystem(
-    WINDOW *window, bool &doorsAreOpen, int &waitingTime, long & runSim) {
+    WINDOW *window, bool &doorsAreOpen, int &waitingTime, long & runSim, std::shared_ptr<WaitingArea> waitingArea) {
   int row{0};
   std::string doorsOpenMessage; 
+  std::vector<std::shared_ptr<Agent>>  agents; 
+  agents = waitingArea->getAgentVector();  
 
   if (!doorsAreOpen) {
     doorsOpenMessage = "Train arrives in " + to_string((waitingTime - runSim) / 1000) + " seconds."; 
@@ -45,9 +47,10 @@ void NCursesDisplay::DisplaySystem(
     doorsOpenMessage = "Train has arrived bitches!"; 
   }
 
-  std::string testString = "lol"; 
+
+  std::string testString = "x"; 
   mvwprintw(window, ++row, 2, ("Status: " + doorsOpenMessage).c_str());
-  mvwprintw(window, ++row, 2, ("Kernel: " + testString).c_str());
+  mvwprintw(window, ++row, 2, ("Agents in waiting area: " + to_string(agents.size())).c_str());
   mvwprintw(window, ++row, 2, "CPU: ");
   wattron(window, COLOR_PAIR(2));
   mvwprintw(window, row, 10, "");
@@ -73,6 +76,10 @@ void NCursesDisplay::DisplayProcesses(
     std::chrono::time_point<std::chrono::system_clock> &simStart){
   // wclear(window);
   std:string placeHString = "*";  
+
+  // Fetch agent's grid
+  std::vector<std::vector<int>> grid = waitingArea->getAgentGrid(doorsAreOpen, waitingTime, simStart); 
+
   int row{0};
   int const pid_column{2};
   int const user_column{9};
@@ -91,8 +98,6 @@ void NCursesDisplay::DisplayProcesses(
   mvwprintw(window, row, time_column, "TIME+");
   mvwprintw(window, row, command_column, "COMMAND");
   wattroff(window, COLOR_PAIR(2));
-  std::vector<std::vector<int>> grid = waitingArea->getAgentGrid(doorsAreOpen, waitingTime, simStart); 
- 
 
   int rowCounter = 3; 
   int colCounter = 3;
@@ -159,7 +164,7 @@ void NCursesDisplay::Display(std::shared_ptr<WaitingArea> waitingArea, int n) {
     wclear(process_window);
     box(system_window, 0, 0);
     box(process_window, 0, 0);
-    DisplaySystem(system_window, doorsAreOpen, waitingTime, runSim); 
+    DisplaySystem(system_window, doorsAreOpen, waitingTime, runSim, waitingArea); 
     DisplayProcesses(process_window, waitingArea, n, doorsAreOpen, waitingTime, simStart); 
     wrefresh(system_window);
     wrefresh(process_window);
