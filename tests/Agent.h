@@ -24,6 +24,7 @@ public:
   void setGridCells(std::vector<std::shared_ptr<GridCell>> cells); 
   void setCurrentGrid();
   void arrivedToDestination(){ _arrivedDestination=true; }
+  int getUnitsUntilGoal(); 
   // void setPreviousPosition(std::shared_ptr<GridCell> position);
   std::shared_ptr<Agent> get_shared_this() { return shared_from_this(); }
 
@@ -47,6 +48,7 @@ private:
   std::vector<std::vector<int>> _currentGrid; 
   bool _arrivedDestination; 
   std::shared_ptr<bool> _openDoor; 
+  int _unitsTilGoal;
 };
 
 #endif

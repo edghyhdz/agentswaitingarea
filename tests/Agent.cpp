@@ -18,7 +18,17 @@ Agent::Agent(std::shared_ptr<GridCell> position,
   _cells = cells;
   _arrivedDestination = false; 
   _currentPosition = position;
-  _speed = 0.5;
+
+  std::random_device rd;
+  std::mt19937 eng(rd());
+  std::uniform_int_distribution<> distr(20, 100);
+  std::uniform_int_distribution<> distrUnits(1, 10);
+  _unitsTilGoal = distrUnits(eng); 
+
+  _speed = double(distr(eng))/100.0; 
+  std::cout << "speed: " << this->_unitsTilGoal<< ", random: "<< double(distr(eng))/100 <<std::endl; 
+
+  // _speed = 0.5;
 }
 
 // setters
@@ -31,8 +41,8 @@ void Agent::walk() {
   std::cout << "Started simulation stuff\n";
   bool hasEnteredCellGrid = false;
 
-  // Update every 1 sec
-  double cycleDuration = 400;
+  // Normal cycle time * agent _speed
+  double cycleDuration = 200 / this->_speed;
   std::chrono::time_point<std::chrono::system_clock> lastUpdate;
 
   lastUpdate = std::chrono::system_clock::now();
@@ -62,6 +72,11 @@ bool Agent::checkAgentInCell(){
 void Agent::moveToValidCell() {
 
   this->Search();
+
+
+  if (this->_unitsTilGoal>this->getUnitsUntilGoal() && *this->_openDoor == false){
+    return; 
+  }
 
   // Only to mark path that agent should follow
   this->_currentPosition->setAStarPath(_currentGrid);
@@ -135,6 +150,18 @@ void Agent::moveToValidCell() {
 
 void Agent::setCurrentPosition(std::shared_ptr<GridCell> position) {
   _currentPosition = position;
+}
+
+int Agent::getUnitsUntilGoal(){
+  int totalUnits = 0; 
+  for (auto &i : this->_currentGrid){
+    for (auto &k : i){
+      if (k == 3) {
+        totalUnits++; 
+      }
+    }
+  }
+  return totalUnits; 
 }
 
 void Agent::setCurrentGrid() {
