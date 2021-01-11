@@ -18,7 +18,7 @@ void DisplayProcesses(
     WINDOW *window, std::shared_ptr<WaitingArea> waitingArea, int n,
     bool &doorsAreOpen, int &waitingTime,
     std::chrono::time_point<std::chrono::system_clock> &simStart);
-void DisplayProcessesTest(WINDOW *window, int n);
+void DisplayAStarPath(WINDOW *window, int n, std::shared_ptr<WaitingArea> waitingArea);
 std::string ProgressBar(float percent);
 }; // namespace NCursesDisplay
 

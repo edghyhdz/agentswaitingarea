@@ -149,7 +149,7 @@ WaitingArea::WaitingArea(int width, int height, int x_exit, int y_exit)
   this->_openDoors = std::make_shared<bool>(false); 
 
   this->constructArea();
-  int agentNumber = 20;
+  int agentNumber = 2;
   std::vector<int> randVector; 
   for (int i = 0; i < agentNumber; ++i) {
     // Randomly initialize agents on grid
@@ -237,7 +237,6 @@ std::vector<std::vector<int>> WaitingArea::getAgentGrid(
       grid[y][x] = 0;
     }
   }
-
   return grid; 
 }
 
@@ -332,6 +331,10 @@ void WaitingArea::printWaitingArea() {
     // std::cout << apath_string;
     // std::cout << "\n";
   }
+}
+
+std::vector<std::vector<int>> WaitingArea::getAgentsGrid(int agentID) { 
+  return this->_agents.at(agentID)->getAStarPath(); 
 }
 
 // Prints addresses of each cell from grid

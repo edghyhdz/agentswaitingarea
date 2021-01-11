@@ -11,6 +11,7 @@ github repo -> https://github.com/udacity/CppND-System-Monitor
 #include <thread>
 #include <vector>
 #include <iostream>
+#include <algorithm> 
 #include "ncurses_display.h"
 
 using std::string;
@@ -124,7 +125,8 @@ void NCursesDisplay::DisplayProcesses(
   }
 }
 
-void NCursesDisplay::DisplayProcessesTest(WINDOW *window, int n){
+// Takes agent 0 and displays his calculated AStar path
+void NCursesDisplay::DisplayAStarPath(WINDOW *window, int n, std::shared_ptr<WaitingArea> waitingArea){
   // wclear(window);
   std:string placeHString = "*";  
 
@@ -137,6 +139,49 @@ void NCursesDisplay::DisplayProcessesTest(WINDOW *window, int n){
   wattron(window, COLOR_PAIR(2));
   mvwprintw(window, ++row, pid_column, "GRAPH STUFF");
   wattroff(window, COLOR_PAIR(2));
+
+  // Minimum of agents in nAgents
+  int nAgents = 1;
+  std::vector<std::vector<int>> aStarPath  = waitingArea->getAgentsGrid(nAgents);
+  std::vector<std::vector<int>> aStarPathR;
+  std::cout << "Size >> " << aStarPath.size()<< std::endl;
+
+  // Transpose grid
+  if (aStarPath.size() > 0) {
+    std::cout << "Size inner >> " << aStarPath[0].size()<< std::endl;
+    for (int i = 0; i < aStarPath[0].size(); i++) {
+      std::vector<int> tempRow;
+      for (int k = 0; k < aStarPath.size(); k++) {
+        tempRow.push_back(aStarPath[k][i]);
+      }
+      aStarPathR.push_back(tempRow);
+    }
+  }
+
+  int rowCounter = 3; 
+  int colCounter = 3;
+  // int colorDoor = (!doorsAreOpen) ? 3 : 7;
+  std::string rowString;
+
+  for (auto k : aStarPathR) {
+    rowCounter++;
+    colCounter = 3;
+    for (auto l : k) {
+      colCounter = colCounter + 2;
+      if (l == 0) {
+        rowString = ". ";
+        mvwprintw(window, rowCounter, colCounter, rowString.c_str());
+      } else if (l == 3) {
+        wattron(window, COLOR_PAIR(3)); 
+        rowString = ".";
+        mvwprintw(window, rowCounter, colCounter, rowString.c_str());
+        wattroff(window, COLOR_PAIR(3)); 
+      } else {
+        rowString = ". ";
+        mvwprintw(window, rowCounter, colCounter, rowString.c_str());
+      }
+    }
+  }
 }
 
 void NCursesDisplay::Display(std::shared_ptr<WaitingArea> waitingArea, int n) {
@@ -148,7 +193,7 @@ void NCursesDisplay::Display(std::shared_ptr<WaitingArea> waitingArea, int n) {
   int x_max{getmaxx(stdscr)};
   WINDOW* system_window = newwin(9, x_max - 1, 0, 0);
   WINDOW *process_window =
-      newwin(3 + n, x_max - x_max / 2 - 1, system_window->_maxy + 1, 0);
+      newwin(3 + n, x_max -( x_max / 2) - 3, system_window->_maxy + 1, 0);
   WINDOW *graph_window =
       newwin(3 + n, x_max - x_max / 2, system_window->_maxy + 1, x_max / 2 - 1);
 
@@ -162,7 +207,7 @@ void NCursesDisplay::Display(std::shared_ptr<WaitingArea> waitingArea, int n) {
   int waitingTime = 20000; // Time until train arrival
 
   while (1) {
-    std::vector<std::vector<int>> grid = waitingArea->getAgentGrid(doorsAreOpen, waitingTime, simStart); 
+    // std::vector<std::vector<int>> grid = waitingArea->getAgentGrid(doorsAreOpen, waitingTime, simStart); 
     long runSim = std::chrono::duration_cast<std::chrono::milliseconds>(
                         std::chrono::system_clock::now() - simStart)
                         .count();
@@ -181,7 +226,7 @@ void NCursesDisplay::Display(std::shared_ptr<WaitingArea> waitingArea, int n) {
     box(graph_window, 0, 0);
     DisplaySystem(system_window, doorsAreOpen, waitingTime, runSim, waitingArea); 
     DisplayProcesses(process_window, waitingArea, n, doorsAreOpen, waitingTime, simStart); 
-    DisplayProcessesTest(graph_window, n); 
+    DisplayAStarPath(graph_window, n, waitingArea); 
 
     wrefresh(system_window);
     wrefresh(process_window);

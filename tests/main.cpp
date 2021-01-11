@@ -12,9 +12,9 @@ int main() {
   
   int width, height, x, y;
 //   std::cin >> width >> height >> x >> y;
-  width = 20; 
-  height = 10;
-  x = 5; 
+  width = 10; 
+  height = 20;
+  x = 10; 
   y = 10; 
   std::shared_ptr<WaitingArea> waitingArea = std::make_shared<WaitingArea>(width, height, x, y); 
   

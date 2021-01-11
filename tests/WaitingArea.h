@@ -96,6 +96,7 @@ public:
   std::vector<std::vector<int>>
   getAgentGrid(bool &doorsAreOpen, int &waitingTime,
                std::chrono::time_point<std::chrono::system_clock> &simStart);
+  std::vector<std::vector<int>> getAgentsGrid(int agentID); 
   void printWaitingArea();
   void printAddresses();
   void simulate();
