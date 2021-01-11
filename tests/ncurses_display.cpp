@@ -168,16 +168,15 @@ void NCursesDisplay::DisplayAStarPath(WINDOW *window, int n, std::shared_ptr<Wai
     colCounter = 3;
     for (auto l : k) {
       colCounter = colCounter + 2;
-      if (l == 0) {
-        rowString = ". ";
-        mvwprintw(window, rowCounter, colCounter, rowString.c_str());
-      } else if (l == 3) {
+      if (l == 3) {
         wattron(window, COLOR_PAIR(3)); 
         rowString = ".";
         mvwprintw(window, rowCounter, colCounter, rowString.c_str());
-        wattroff(window, COLOR_PAIR(3)); 
+        wattroff(window, COLOR_PAIR(3));
+      // } else if (l == 3) {
+
       } else {
-        rowString = ". ";
+        rowString = to_string(l);
         mvwprintw(window, rowCounter, colCounter, rowString.c_str());
       }
     }
