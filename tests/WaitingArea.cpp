@@ -228,7 +228,9 @@ std::vector<std::vector<int>> WaitingArea::getAgentGrid(
         }
       }
       grid[y][x] = 1;
-    } else if (y == this->_height - 1 && x == this->_width -1 ){
+    } else if (y == this->_y_exit - 1 && x == this->_x_exit -1 ){
+      // std::cout << "coords: (" << x << ", " << y << "), exit coords: (" << this->_x_exit << ", " << this->_y_exit << ")" << std::endl; 
+    // } else if (y == this->_height - 1 && x == this->_width -1 ){
       grid[y][x] = 2;
     }
     else {
@@ -286,7 +288,7 @@ void WaitingArea::printWaitingArea() {
           }
         }
         grid[y][x] = 1;
-      } else if (y == this->_height - 1 && x == this->_width -1 ){
+      } else if (y == this->_y_exit - 1 && x == this->_x_exit -1 ){
         grid[y][x] = 2;
       }
       else {
