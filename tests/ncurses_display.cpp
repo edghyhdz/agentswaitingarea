@@ -45,7 +45,7 @@ void NCursesDisplay::DisplaySystem(
     doorsOpenMessage = "Train arrives in " + to_string((waitingTime - runSim) / 1000) + " seconds."; 
   }
   else {
-    doorsOpenMessage = "Train has arrived bitches!"; 
+    doorsOpenMessage = "Train has arrived!"; 
   }
 
   int totalAgents = 0; 
@@ -203,7 +203,7 @@ void NCursesDisplay::Display(std::shared_ptr<WaitingArea> waitingArea, int n) {
   std::chrono::time_point<std::chrono::system_clock> simStart;
   simStart = std::chrono::system_clock::now();
   bool doorsAreOpen = false; 
-  int waitingTime = 20000; // Time until train arrival
+  int waitingTime = 15000; // Time until train arrival
 
   while (1) {
     // std::vector<std::vector<int>> grid = waitingArea->getAgentGrid(doorsAreOpen, waitingTime, simStart); 

@@ -31,13 +31,17 @@ public:
   void setAStarPath(std::vector<std::vector<int>> currentGrid); 
 
   // Related to A* search
-  // bool compareCells(const std::vector<int> a, const std::vector<int> b);
-  void cellSort(std::vector<std::vector<int>> *v);
+  void cellSort(std::vector<std::vector<double>> *v);
+  // void cellSort(std::vector<std::vector<int>> *v);
   bool checkValidCell(int x, int y); 
   // Calculate the manhattan distance
-  int calculateHeuristic(int x_current, int y_current); 
-  void addToOpen(int x, int y, int g, int h); 
-  void expandNeighbors(std::vector<int> &current);
+  double calculateHeuristic(int x_current, int y_current); 
+  void addToOpen(double x, double y, double g, double h); 
+  void expandNeighbors(std::vector<double> &current);
+
+  // int calculateHeuristic(int x_current, int y_current); 
+  // void addToOpen(int x, int y, int g, int h); 
+  // void expandNeighbors(std::vector<int> &current);
   void Search(); 
 
 private:
@@ -46,7 +50,8 @@ private:
   // std::shared_ptr<GridCell> _previousPosition; 
   double _speed;
   std::vector<std::shared_ptr<GridCell>> _cells;
-  std::vector<std::vector<int>> _openList; 
+  std::vector<std::vector<double>> _openList; 
+  // std::vector<std::vector<int>> _openList; 
   std::vector<std::vector<int>> _currentGrid; 
   bool _arrivedDestination; 
   std::shared_ptr<bool> _openDoor; 

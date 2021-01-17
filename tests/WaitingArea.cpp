@@ -248,7 +248,7 @@ void WaitingArea::printWaitingArea() {
   std::chrono::time_point<std::chrono::system_clock> simStart;
   simStart = std::chrono::system_clock::now();
   bool doorsAreOpen = false; 
-  int waitingTime = 20000; // Time until train arrival
+  int waitingTime = 5000; // Time until train arrival
   while (true) {
 
     long runningSim =

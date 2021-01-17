@@ -73,9 +73,10 @@ void Agent::setAStarPath(std::vector<std::vector<int>> currentGrid){
 }
 
 void Agent::moveToValidCell() {
-
+  // Every Step, agent calculates path
   this->Search();
 
+  // Adds some randomness to the movement of the agent
   if (this->_unitsTilGoal>this->getUnitsUntilGoal() && *this->_openDoor == false){
     return; 
   }
@@ -109,6 +110,8 @@ void Agent::moveToValidCell() {
         foundCell = true;
         int cellID = this->_currentPosition->getX() * (y_1 + 1) -
                      (this->_currentPosition->getX() - x_1);
+
+        // Vector of valid cells to move to
         validCells.push_back(cellID);
       }
       else if (_currentGrid[x_1][y_1] == 5 && this->_arrivedDestination==false && (*this->_openDoor)==true) {
@@ -136,19 +139,63 @@ void Agent::moveToValidCell() {
   // Choose next cell randomly from validCells vector
   // Only if we have not arrived yet to destination
   if (foundCell) {
-    std::random_device rd;
-    std::mt19937 eng(rd());
-    std::uniform_int_distribution<> distr(0, validCells.size() - 1);
-    nextGrid = _cells.at(validCells.at(distr(eng)));
 
-    nextGrid->addAgentToQueue(this->get_shared_this()); 
-    // Remove current cell's agent
-    this->_currentPosition->updateCell();
-    // Update next grid cell with agent 
-    nextGrid->updateCell(this->get_shared_this());
-    this->setCurrentPosition(nextGrid);
+    // Get closests cell to home -> after doors are opened
+
+    if ((*this->_openDoor)) {
+      double x_0, y_0, x_1, y_1, y_diff, x_diff, d_goal;
+
+      x_0 = this->_currentPosition->getXGoal() - 1;
+      y_0 = this->_currentPosition->getYGoal() - 1;
+      std::vector<double> distVector;
+      for (int &cellID : validCells) {
+        std::tuple<int, int> tempCoords = _cells.at(cellID)->getCoordinates();
+
+        x_1 = std::get<0>(tempCoords);
+        y_1 = std::get<1>(tempCoords);
+
+        x_diff = std::abs(x_1 - x_0);
+        y_diff = std::abs(y_1 - y_0);
+
+        d_goal = std::sqrt(std::pow(x_diff, 2) + std::pow(y_diff, 2));
+        distVector.push_back(d_goal);
+      }
+
+      auto minDist = std::min_element(distVector.begin(), distVector.end());
+      int indexMinDist = std::distance(distVector.begin(), minDist);
+      // auto maxDist = std::max_element(distVector.begin(),
+      // distVector.end()); int indexMaxDist = std::distance(distVector.begin(),
+      // maxDist);
+
+      std::cout << "Minimum distance: " << *minDist
+                << ", with index: " << indexMinDist << std::endl;
+      // std::cout << "Maximum distance: " << *maxDist << ", with index: "
+      // << indexMaxDist << std::endl;
+
+      nextGrid = _cells.at(validCells.at(indexMinDist));
+
+      nextGrid->addAgentToQueue(this->get_shared_this());
+      // Remove current cell's agent
+      this->_currentPosition->updateCell();
+      // Update next grid cell with agent
+      nextGrid->updateCell(this->get_shared_this());
+      this->setCurrentPosition(nextGrid);
+
+    } else {
+
+      std::random_device rd;
+      std::mt19937 eng(rd());
+      std::uniform_int_distribution<> distr(0, validCells.size() - 1);
+      nextGrid = _cells.at(validCells.at(distr(eng)));
+
+      nextGrid->addAgentToQueue(this->get_shared_this());
+      // Remove current cell's agent
+      this->_currentPosition->updateCell();
+      // Update next grid cell with agent
+      nextGrid->updateCell(this->get_shared_this());
+      this->setCurrentPosition(nextGrid);
+    }
   }
-
 };
 
 void Agent::setCurrentPosition(std::shared_ptr<GridCell> position) {
@@ -186,12 +233,12 @@ void Agent::setCurrentGrid() {
   }
 }
 
-static bool compareCells(const std::vector<int> a, const std::vector<int> b) {
-  int f1 = a[2] + a[3]; // f1 = g1 + h1
-  int f2 = b[2] + b[3]; // f2 = g2 + h2
+static bool compareCells(const std::vector<double> a, const std::vector<double> b) {
+  double f1 = a[2] + a[3]; // f1 = g1 + h1
+  double f2 = b[2] + b[3]; // f2 = g2 + h2
   return f1 > f2;
 }
-void Agent::cellSort(std::vector<std::vector<int>> *v) {
+void Agent::cellSort(std::vector<std::vector<double>> *v) {
   std::sort(v->begin(), v->end(), compareCells);
 }
 
@@ -203,21 +250,21 @@ bool Agent::checkValidCell(int x, int y) {
   return false;
 }
 
-int Agent::calculateHeuristic(int x_current, int y_current) {
+double Agent::calculateHeuristic(int x_current, int y_current) {
   return abs(x_current - this->_currentPosition->getXGoal() - 1) +
          abs(y_current - this->_currentPosition->getYGoal() - 1);
 }
 
-void Agent::addToOpen(int x, int y, int g, int h) {
-  _openList.push_back(std::vector<int>{x, y, g, h});
+void Agent::addToOpen(double x, double y, double g, double h) {
+  _openList.push_back(std::vector<double>{x, y, g, h});
   _currentGrid[x][y] = 1; // Closed
 }
 
-void Agent::expandNeighbors(std::vector<int> &current) {
+void Agent::expandNeighbors(std::vector<double> &current) {
   // Get current node's data.
-  int x = current[0];
-  int y = current[1];
-  int g = current[2];
+  int x = (int)current[0];
+  int y = (int)current[1];
+  double g = current[2];
 
   // Loop through current node's potential neighbors.
   for (int i = 0; i < 4; i++) {
@@ -226,10 +273,17 @@ void Agent::expandNeighbors(std::vector<int> &current) {
 
     // Check that the potential neighbor's x2 and y2 values are on the grid and
     // not closed.
+    double multFactor = 1.0;
+    double hFactor = 1.0; 
+    if ((*this->_openDoor)) {
+      multFactor = 0.0;
+      hFactor = 1.0; 
+    }
+
     if (this->checkValidCell(x2, y2)) {
       // Increment g value and add neighbor to open list.
-      int g2 = g + 1;
-      int h2 = this->calculateHeuristic(x2, y2);
+      double g2 = g + (1.0 * multFactor); 
+      double h2 = this->calculateHeuristic(x2, y2) * hFactor;
       this->addToOpen(x2, y2, g2, h2);
     }
   }
@@ -242,8 +296,8 @@ void Agent::Search() {
   std::tuple<int, int> coords = this->_currentPosition->getCoordinates();
   int x = std::get<0>(coords);
   int y = std::get<1>(coords);
-  int g = 0;
-  int h = this->calculateHeuristic(x, y);
+  double g = 0;
+  double h = this->calculateHeuristic(x, y);
   this->addToOpen(x, y, g, h);
 
   while (_openList.size() > 0) {
