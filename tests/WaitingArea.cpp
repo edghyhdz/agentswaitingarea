@@ -6,6 +6,7 @@
 #include <iostream>
 #include <random>
 #include <thread>
+#include <fstream>
 
 /*
 WaitingAgents member function definitions
@@ -79,10 +80,21 @@ void GridCell::addAgentToQueue(std::shared_ptr<Agent> agent) {
   std::promise<void> prms;
   std::future<void> ftr = prms.get_future(); 
   _waitingAgents.pushBack(agent, std::move(prms)); 
-
   // std::cout << "Added agent to exit queue\n"; 
   // Wait until agent is allowed to enter
-  ftr.wait(); 
+  std::ofstream myfile;
+  // if (this->_arrivedDestination==false) {
+  std::tuple<int, int> tempCoords = this->getCoordinates();
+  int x_this = std::get<0>(tempCoords);
+  int y_this = std::get<1>(tempCoords);
+  myfile.open ("BLOCKEDCELLS.txt", std::ios_base::app);
+  myfile << "Cell " << this->getID() << ", coords: (" << x_this << ", " << y_this << ")" << " entered to limbo\n" << std::endl; 
+  myfile.close();
+
+  ftr.wait();
+  myfile.open ("BLOCKEDCELLS.txt", std::ios_base::app);
+  myfile << "Cell " << this->getID() << " exitedlimbo\n" << std::endl; 
+  myfile.close();
 
 }
 
@@ -149,7 +161,7 @@ WaitingArea::WaitingArea(int width, int height, int x_exit, int y_exit)
   this->_openDoors = std::make_shared<bool>(false); 
 
   this->constructArea();
-  int agentNumber = 2;
+  int agentNumber = 20;
   std::vector<int> randVector; 
   for (int i = 0; i < agentNumber; ++i) {
     // Randomly initialize agents on grid

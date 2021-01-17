@@ -13,6 +13,8 @@ github repo -> https://github.com/udacity/CppND-System-Monitor
 #include <iostream>
 #include <algorithm> 
 #include "ncurses_display.h"
+#include <fstream>
+
 
 using std::string;
 using std::to_string;
@@ -141,7 +143,7 @@ void NCursesDisplay::DisplayAStarPath(WINDOW *window, int n, std::shared_ptr<Wai
   wattroff(window, COLOR_PAIR(2));
 
   // Minimum of agents in nAgents
-  int nAgents = 1;
+  int nAgents = 0;
   std::vector<std::vector<int>> aStarPath  = waitingArea->getAgentsGrid(nAgents);
   std::vector<std::vector<int>> aStarPathR;
   std::cout << "Size >> " << aStarPath.size()<< std::endl;
@@ -188,7 +190,7 @@ void NCursesDisplay::Display(std::shared_ptr<WaitingArea> waitingArea, int n) {
   noecho();       // do not print input values
   cbreak();       // terminate ncurses on ctrl + c
   start_color();  // enable color
-
+  keypad(stdscr, TRUE); 
   int x_max{getmaxx(stdscr)};
   WINDOW* system_window = newwin(9, x_max - 1, 0, 0);
   WINDOW *process_window =
@@ -204,8 +206,17 @@ void NCursesDisplay::Display(std::shared_ptr<WaitingArea> waitingArea, int n) {
   simStart = std::chrono::system_clock::now();
   bool doorsAreOpen = false; 
   int waitingTime = 15000; // Time until train arrival
+  // std::ofstream myfile;
+  // wtimeout(stdscr, 1);
 
   while (1) {
+    
+    // if (wgetch(system_window) == KEY_F(1)){
+    //   myfile.open ("testKEY.txt");
+    //   myfile << "PRSSED KEY! " << std::endl; 
+    //   myfile.close();
+    // }
+
     // std::vector<std::vector<int>> grid = waitingArea->getAgentGrid(doorsAreOpen, waitingTime, simStart); 
     long runSim = std::chrono::duration_cast<std::chrono::milliseconds>(
                         std::chrono::system_clock::now() - simStart)

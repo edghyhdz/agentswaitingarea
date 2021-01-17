@@ -63,9 +63,11 @@ void Agent::walk() {
   }
 }
 
-// Checks if there is an agent already in that cell to move to
-bool Agent::checkAgentInCell(){
-  
+// Checks for how many time steps agent is in same cell coordinates
+void Agent::sameCellCounter(){
+
+  this ->_currentPosition->getCoordinates(); 
+
 }
 
 void Agent::setAStarPath(std::vector<std::vector<int>> currentGrid){
@@ -101,24 +103,30 @@ void Agent::moveToValidCell() {
     int x_1 = x_this + delta[i][0];
     int y_1 = y_this + delta[i][1];
 
+
+    int cellID = this->_currentPosition->getX() * (y_1 + 1) -
+                (this->_currentPosition->getX() - x_1);
+
     // Check first if cells are on grid and if they
     // have value = 3, meaning they are found a* path
     bool on_grid_x = (x_1 >= 0 && x_1 < this->_currentPosition->getX());
     bool on_grid_y = (y_1 >= 0 && y_1 < this->_currentPosition->getY());
+    
+    // if (on_grid_x && on_grid_y && cellTaken==false) {
     if (on_grid_x && on_grid_y) {
-      if (_currentGrid[x_1][y_1] == 3) {
+
+      bool cellTaken = this->_cells.at(cellID)->cellIsTaken();
+
+      if (_currentGrid[x_1][y_1] == 3 && this->_arrivedDestination == false &&
+          cellTaken == false) {
         foundCell = true;
-        int cellID = this->_currentPosition->getX() * (y_1 + 1) -
-                     (this->_currentPosition->getX() - x_1);
 
         // Vector of valid cells to move to
         validCells.push_back(cellID);
       }
       else if (_currentGrid[x_1][y_1] == 5 && this->_arrivedDestination==false && (*this->_openDoor)==true) {
         // Put cell back again until granted access
-        std::cout << "Agent arrived to destination\n"; 
-        int cellID = this->_currentPosition->getX() * (y_1 + 1) -
-                     (this->_currentPosition->getX() - x_1);
+        std::cout << "Agent arrived to destination" << std::endl; 
 
         // Get exit Cell ID
         nextGrid = _cells.at(cellID);
@@ -139,9 +147,7 @@ void Agent::moveToValidCell() {
   // Choose next cell randomly from validCells vector
   // Only if we have not arrived yet to destination
   if (foundCell) {
-
     // Get closests cell to home -> after doors are opened
-
     if ((*this->_openDoor)) {
       double x_0, y_0, x_1, y_1, y_diff, x_diff, d_goal;
 
@@ -163,14 +169,6 @@ void Agent::moveToValidCell() {
 
       auto minDist = std::min_element(distVector.begin(), distVector.end());
       int indexMinDist = std::distance(distVector.begin(), minDist);
-      // auto maxDist = std::max_element(distVector.begin(),
-      // distVector.end()); int indexMaxDist = std::distance(distVector.begin(),
-      // maxDist);
-
-      std::cout << "Minimum distance: " << *minDist
-                << ", with index: " << indexMinDist << std::endl;
-      // std::cout << "Maximum distance: " << *maxDist << ", with index: "
-      // << indexMaxDist << std::endl;
 
       nextGrid = _cells.at(validCells.at(indexMinDist));
 
@@ -274,16 +272,14 @@ void Agent::expandNeighbors(std::vector<double> &current) {
     // Check that the potential neighbor's x2 and y2 values are on the grid and
     // not closed.
     double multFactor = 1.0;
-    double hFactor = 1.0; 
     if ((*this->_openDoor)) {
-      multFactor = 0.0;
-      hFactor = 1.0; 
+      multFactor = 1.0;
     }
 
     if (this->checkValidCell(x2, y2)) {
       // Increment g value and add neighbor to open list.
       double g2 = g + (1.0 * multFactor); 
-      double h2 = this->calculateHeuristic(x2, y2) * hFactor;
+      double h2 = this->calculateHeuristic(x2, y2);
       this->addToOpen(x2, y2, g2, h2);
     }
   }
@@ -324,13 +320,5 @@ void Agent::Search() {
 
 /*
 TODO:
-Agents can also decide to move somewhere else, if so then they need to update
-_waitingList accordingly
-- Agents should just move once they are given clearance to move into cell that
-is busy at the moment
-- Boundary conditions -> where agents spawn from
-  - Agents will only spawn if boundary condition is free -> _waitingList
-boundary or so
-- Print board
-  - Use ncursor or so in order not to print all times into console
+  - ADD MUTEX WHEN CHANGING CELL TO OCCUPIED BY AGENT
 */
