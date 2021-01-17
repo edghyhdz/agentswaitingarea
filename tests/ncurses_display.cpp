@@ -42,12 +42,14 @@ void NCursesDisplay::DisplaySystem(
   std::string doorsOpenMessage; 
   std::vector<std::shared_ptr<Agent>>  agents; 
   agents = waitingArea->getAgentVector();  
+  long oDoorsTime = 0.0; 
 
   if (!doorsAreOpen) {
     doorsOpenMessage = "Train arrives in " + to_string((waitingTime - runSim) / 1000) + " seconds."; 
   }
   else {
-    doorsOpenMessage = "Train has arrived!"; 
+    doorsOpenMessage = "Train has arrived!";
+    oDoorsTime = runSim / 1000; 
   }
 
   int totalAgents = 0; 
@@ -59,17 +61,18 @@ void NCursesDisplay::DisplaySystem(
 
   std::string testString = "x"; 
   mvwprintw(window, ++row, 2, ("Status: " + doorsOpenMessage).c_str());
+  mvwprintw(window, ++row, 2, ("Doors opened for: " + to_string(oDoorsTime) + " seconds.").c_str());
   mvwprintw(window, ++row, 2, ("Agents simulated: " + to_string(agents.size())).c_str());
   mvwprintw(window, ++row, 2, ("Agents in waiting area: " + to_string(totalAgents)).c_str()); 
-  wattron(window, COLOR_PAIR(2));
-  mvwprintw(window, row, 10, "");
-  wprintw(window, ProgressBar(0.50).c_str());
-  wattroff(window, COLOR_PAIR(2));
-  mvwprintw(window, ++row, 2, "Memory: ");
-  wattron(window, COLOR_PAIR(2));
-  mvwprintw(window, row, 10, "");
-  wprintw(window, ProgressBar(0.50).c_str());
-  wattroff(window, COLOR_PAIR(2));
+  // wattron(window, COLOR_PAIR(2));
+  // mvwprintw(window, row, 10, "");
+  // wprintw(window, ProgressBar(0.50).c_str());
+  // wattroff(window, COLOR_PAIR(2));
+  // mvwprintw(window, ++row, 2, "Memory: ");
+  // wattron(window, COLOR_PAIR(2));
+  // mvwprintw(window, row, 10, "");
+  // wprintw(window, ProgressBar(0.50).c_str());
+  // wattroff(window, COLOR_PAIR(2));
   mvwprintw(window, ++row, 2,
             ("Agents in waiting area: " + to_string(totalAgents)).c_str()); 
   mvwprintw(

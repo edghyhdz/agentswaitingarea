@@ -80,21 +80,19 @@ void GridCell::addAgentToQueue(std::shared_ptr<Agent> agent) {
   std::promise<void> prms;
   std::future<void> ftr = prms.get_future(); 
   _waitingAgents.pushBack(agent, std::move(prms)); 
-  // std::cout << "Added agent to exit queue\n"; 
   // Wait until agent is allowed to enter
   std::ofstream myfile;
-  // if (this->_arrivedDestination==false) {
   std::tuple<int, int> tempCoords = this->getCoordinates();
   int x_this = std::get<0>(tempCoords);
   int y_this = std::get<1>(tempCoords);
-  myfile.open ("BLOCKEDCELLS.txt", std::ios_base::app);
-  myfile << "Cell " << this->getID() << ", coords: (" << x_this << ", " << y_this << ")" << " entered to limbo\n" << std::endl; 
-  myfile.close();
+  // myfile.open ("BLOCKEDCELLS.txt", std::ios_base::app);
+  // myfile << "Cell " << this->getID() << ", coords: (" << x_this << ", " << y_this << ")" << " entered to limbo\n" << std::endl; 
+  // myfile.close();
 
   ftr.wait();
-  myfile.open ("BLOCKEDCELLS.txt", std::ios_base::app);
-  myfile << "Cell " << this->getID() << " exitedlimbo\n" << std::endl; 
-  myfile.close();
+  // myfile.open ("BLOCKEDCELLS.txt", std::ios_base::app);
+  // myfile << "Cell " << this->getID() << " exitedlimbo\n" << std::endl; 
+  // myfile.close();
 
 }
 
@@ -132,21 +130,9 @@ void WaitingArea::constructArea() {
       auto temp = this->_cells.back();
       std::tuple<int, int> temp_coords = temp->getCoordinates();
       ;
-      // Launch thread to permit entry to exit
+      // Launch thread to permit entry to cell
       _threads.emplace_back(std::thread(&GridCell::processAgentQueue, temp)); 
-      if (_x_exit - 1 == i && _y_exit - 1 == k) {
-        rows += "(" + std::to_string(std::get<0>(temp->getCoordinates())) +
-                ", " + std::to_string(std::get<1>(temp_coords)) + ") ";
-        // Launch thread to permit entry to exit
-        // _threads.emplace_back(std::thread(&GridCell::processAgentQueue, temp)); 
-        // rows += " X";
-      } else {
-        rows += "(" + std::to_string(std::get<0>(temp->getCoordinates())) +
-                ", " + std::to_string(std::get<1>(temp_coords)) + ") ";
-        // rows += " #";
-      }
     }
-    this->_grid += rows + "\n";
   }
 }
 
@@ -221,6 +207,9 @@ std::vector<std::vector<int>> WaitingArea::getAgentGrid(
   if (runningSim >= waitingTime && doorsAreOpen == false) {
     this->openDoor(true);
     doorsAreOpen = true;
+
+    // Reset simStart to now
+    simStart = std::chrono::system_clock::now();
   }
 
   std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -241,8 +230,6 @@ std::vector<std::vector<int>> WaitingArea::getAgentGrid(
       }
       grid[y][x] = 1;
     } else if (y == this->_y_exit - 1 && x == this->_x_exit -1 ){
-      // std::cout << "coords: (" << x << ", " << y << "), exit coords: (" << this->_x_exit << ", " << this->_y_exit << ")" << std::endl; 
-    // } else if (y == this->_height - 1 && x == this->_width -1 ){
       grid[y][x] = 2;
     }
     else {

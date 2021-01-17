@@ -266,7 +266,7 @@ void Agent::expandNeighbors(std::vector<double> &current) {
     // not closed.
     double multFactor = 1.0;
     if ((*this->_openDoor)) {
-      multFactor = 1.0;
+      multFactor = 0.5;
     }
 
     if (this->checkValidCell(x2, y2)) {
