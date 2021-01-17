@@ -63,13 +63,6 @@ void Agent::walk() {
   }
 }
 
-// Checks for how many time steps agent is in same cell coordinates
-void Agent::sameCellCounter(){
-
-  this ->_currentPosition->getCoordinates(); 
-
-}
-
 void Agent::setAStarPath(std::vector<std::vector<int>> currentGrid){
   this->_aStarPath = _currentGrid; 
 }

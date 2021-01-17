@@ -18,8 +18,6 @@ public:
   void setCurrentPosition(std::shared_ptr<GridCell> position);
   void walk();
   void moveToValidCell();
-  void sameCellCounter(); 
-  int getSameCellCounter() { return _sameCellCounter; }
   bool checkAgentInCell(); 
   
   void calculatePath();  
@@ -59,7 +57,6 @@ private:
   std::shared_ptr<bool> _openDoor; 
   int _unitsTilGoal;
   std::vector<std::vector<int>> _aStarPath;
-  int _sameCellCounter{0}; 
 };
 
 #endif
