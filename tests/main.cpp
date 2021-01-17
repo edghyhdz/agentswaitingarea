@@ -14,8 +14,8 @@ int main() {
 //   std::cin >> width >> height >> x >> y;
   width = 20; 
   height = 20;
-  x = 20; 
-  y = 1; 
+  x = 10; 
+  y = 10; 
   std::shared_ptr<WaitingArea> waitingArea = std::make_shared<WaitingArea>(width, height, x, y); 
   
   NCursesDisplay::Display(std::move(waitingArea), 30);
