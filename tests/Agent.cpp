@@ -279,7 +279,7 @@ void Agent::expandNeighbors(std::vector<double> &current) {
     // Check that the potential neighbor's x2 and y2 values are on the grid and
     // not closed.
     double multFactor = 1.0;
-    if ((*this->_openDoor)) {
+    if ((*this->_openDoor) && this->isExitAgent() == false) {
       multFactor = 0.5;
     }
 
