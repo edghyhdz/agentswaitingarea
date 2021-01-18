@@ -308,8 +308,10 @@ void Agent::Search() {
     _currentGrid[x][y] = 3;
 
     // Check if we're done.
-    if (x == this->_currentPosition->getXGoal() - 1 &&
-        y == this->_currentPosition->getYGoal() - 1) {
+    if (x == this->getXGoal() - 1 &&
+        y == this->getYGoal() - 1) {
+    // if (x == this->_currentPosition->getXGoal() - 1 &&
+    //     y == this->_currentPosition->getYGoal() - 1) {
       _currentGrid[std::get<0>(coords)][std::get<1>(coords)] = 0;
       _currentGrid[x][y] = 5;
       break;
