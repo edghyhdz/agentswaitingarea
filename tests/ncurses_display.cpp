@@ -104,6 +104,7 @@ void NCursesDisplay::DisplayProcesses(
   int rowCounter = 3; 
   int colCounter = 3;
   int colorDoor = (!doorsAreOpen) ? 3 : 7;
+  int colorAgent; 
   std::string rowString;
 
   for (auto k : grid) {
@@ -114,11 +115,13 @@ void NCursesDisplay::DisplayProcesses(
       if (l == 0) {
         rowString = ". ";
         mvwprintw(window, rowCounter, colCounter, rowString.c_str());
-      } else if (l == 1) {
-        wattron(window, COLOR_PAIR(4)); 
+      } else if (l == 1 || l == 7) {
+        colorAgent = (l == 1) ? 4 : 3;
+
+        wattron(window, COLOR_PAIR(colorAgent)); 
         rowString = "A ";
         mvwprintw(window, rowCounter, colCounter, rowString.c_str());
-        wattroff(window, COLOR_PAIR(4)); 
+        wattroff(window, COLOR_PAIR(colorAgent)); 
 
       } else if (l == 2) {
         wattron(window, COLOR_PAIR(colorDoor)); 

@@ -14,7 +14,7 @@ Agent class declaration
 class Agent : public std::enable_shared_from_this<Agent> {
 public:
   Agent();
-  Agent(std::shared_ptr<GridCell> currentPosition, std::vector<std::shared_ptr<GridCell>> &cells, std::shared_ptr<bool> &openDoor, int x_goal, int y_goal); 
+  Agent(std::shared_ptr<GridCell> currentPosition, std::vector<std::shared_ptr<GridCell>> &cells, std::shared_ptr<bool> &openDoor, int x_goal, int y_goal, bool exitAgent); 
   void setCurrentPosition(std::shared_ptr<GridCell> position);
   void walk();
   void moveToValidCell();
@@ -39,8 +39,9 @@ public:
   void addToOpen(double x, double y, double g, double h); 
   void expandNeighbors(std::vector<double> &current);
 
-  int getXGoal() { return _x_goal; }; 
-  int getYGoal() { return _y_goal; }; 
+  int getXGoal() { return _x_goal; } 
+  int getYGoal() { return _y_goal; }
+  bool isExitAgent() { return _exitAgent; } 
 
   // int calculateHeuristic(int x_current, int y_current); 
   // void addToOpen(int x, int y, int g, int h); 
@@ -51,6 +52,7 @@ private:
   void move();
   int _x_goal; 
   int _y_goal; 
+  bool _exitAgent; 
   std::shared_ptr<GridCell> _currentPosition;
   double _speed;
   std::vector<std::shared_ptr<GridCell>> _cells;

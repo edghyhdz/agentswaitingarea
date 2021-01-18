@@ -60,6 +60,7 @@ public:
   int getYGoal() { return _y_goal; }
 
   std::shared_ptr<GridCell> get_shared_this() { return shared_from_this(); }
+  bool isExitAgent();
 
   void setAStarPath(std::vector<std::vector<int>> aPath);
   std::vector<std::vector<int>> getAStartPath() { return _aPath; }

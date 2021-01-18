@@ -64,6 +64,8 @@ void GridCell::calculateCoordinates() {
   }
 };
 
+bool GridCell::isExitAgent() { return _currentAgent->isExitAgent(); }
+
 // Used only to unlock cell
 void GridCell::updateCell() {
   this->_occupied = false;
@@ -145,14 +147,16 @@ WaitingArea::WaitingArea(int width, int height, int x_exit, int y_exit)
   this->_openDoors = std::make_shared<bool>(false); 
 
   this->constructArea();
-  int agentNumber = 20;
+  int agentNumber = 10;
   std::vector<int> randVector; 
 
-  int exitID =( _x_exit * (_y_exit - 1) + _x_exit) - 1; 
+  // Get exit cell id
+  int exitID = (width * (_y_exit - 1) + _x_exit) - 1;
+
+  std::shared_ptr<GridCell> init_grid, init_grid_exit;
 
   for (int i = 0; i < agentNumber; ++i) {
     // Randomly initialize agents on grid
-    std::shared_ptr<GridCell> init_grid, init_grid_exit;
     std::random_device rd;
     std::mt19937 eng(rd());
     std::uniform_int_distribution<> distr(0, _cells.size() - 1);
@@ -162,9 +166,11 @@ WaitingArea::WaitingArea(int width, int height, int x_exit, int y_exit)
     init_grid_exit = _cells.at(exitID); 
     
     // init_grid = _cells.at(i); 
-    std::shared_ptr<Agent> agent = std::make_shared<Agent>(init_grid_exit, _cells, _openDoors, width, height);
+    std::shared_ptr<Agent> agent = std::make_shared<Agent>(init_grid_exit, _cells, _openDoors, 1, 1, true);
+    init_grid_exit->updateCell(agent);
+
     // std::shared_ptr<Agent> agent = std::make_shared<Agent>(init_grid, _cells, _openDoors, x_exit, y_exit);
-    init_grid->updateCell(agent);
+    // init_grid->updateCell(agent);
     _agents.emplace_back(agent);
 
     // if (!(std::count(randVector.begin(), randVector.end(), randNumber))){
@@ -177,6 +183,14 @@ WaitingArea::WaitingArea(int width, int height, int x_exit, int y_exit)
     //   // add to randVector so that position is not reppeated again
     //   randVector.push_back(randNumber); 
     // }
+  }
+
+  // Agents going out
+  for (int i = 0; i < agentNumber; ++i) {
+    init_grid = _cells.at(0);
+    std::shared_ptr<Agent> agent = std::make_shared<Agent>(init_grid, _cells, _openDoors, x_exit, y_exit, false);
+    init_grid->updateCell(agent);
+    _agents.emplace_back(agent);
   }
 }
 
@@ -230,17 +244,13 @@ std::vector<std::vector<int>> WaitingArea::getAgentGrid(
     x = std::get<0>(tmp);
     y = std::get<1>(tmp);
 
-    if (cell->cellIsTaken()) {
-      for (auto &c : _cells) {
-        if (c->getID() == cell->getID()) {
-          a_path = c->getAStartPath();
-        }
-      }
+    if (cell->cellIsTaken() == true && cell->isExitAgent() == false) {
       grid[y][x] = 1;
-    } else if (y == this->_y_exit - 1 && x == this->_x_exit -1 ){
+    } else if (cell->cellIsTaken() == true && cell->isExitAgent() == true) {
+      grid[y][x] = 7;
+    } else if (y == this->_y_exit - 1 && x == this->_x_exit - 1) {
       grid[y][x] = 2;
-    }
-    else {
+    } else {
       grid[y][x] = 0;
     }
   }

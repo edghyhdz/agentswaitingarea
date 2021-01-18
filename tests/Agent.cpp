@@ -10,11 +10,12 @@ Agent::Agent() {
 
 Agent::Agent(std::shared_ptr<GridCell> position,
              std::vector<std::shared_ptr<GridCell>> &cells,
-             std::shared_ptr<bool> &openDoor, int x_goal, int y_goal) {
+             std::shared_ptr<bool> &openDoor, int x_goal, int y_goal, bool exitAgent) {
   std::cout << "Initialized agent with current position id: "
             << position->getID() << ". Coords: ("
             << std::get<0>(position->getCoordinates()) << ", "
             << std::get<1>(position->getCoordinates()) << ")" << std::endl;
+  _exitAgent = exitAgent; 
   _x_goal = x_goal;  
   _y_goal = y_goal;            
   _openDoor = openDoor; 
@@ -60,7 +61,11 @@ void Agent::walk() {
             .count();
 
     if (timeSinceLastUpdate >= cycleDuration) {
-      this->moveToValidCell();
+      if (this->isExitAgent() == true && (*this->_openDoor) == true) {
+        this->moveToValidCell();
+      } else if (this->isExitAgent() == false) {
+        this->moveToValidCell();
+      }
       lastUpdate = std::chrono::system_clock::now();
     }
   }
