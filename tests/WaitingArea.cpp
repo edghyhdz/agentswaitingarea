@@ -66,12 +66,10 @@ void GridCell::calculateCoordinates() {
 
 // Used only to unlock cell
 void GridCell::updateCell() {
-  // this->_aPath.clear();
   this->_occupied = false;
   this->_currentAgent = nullptr;
 }
 void GridCell::updateCell(std::shared_ptr<Agent> agent) {
-  // agent->setPreviousPosition(this->get_shared_this());
   this->_occupied = true;
   this->_currentAgent = agent;
 }
@@ -159,7 +157,7 @@ WaitingArea::WaitingArea(int width, int height, int x_exit, int y_exit)
 
     init_grid = _cells.at(0);
     // init_grid = _cells.at(i); 
-    std::shared_ptr<Agent> agent = std::make_shared<Agent>(init_grid, _cells, _openDoors);
+    std::shared_ptr<Agent> agent = std::make_shared<Agent>(init_grid, _cells, _openDoors, x_exit, y_exit);
     init_grid->updateCell(agent);
     _agents.emplace_back(agent);
 
@@ -182,12 +180,16 @@ WaitingArea::~WaitingArea() {
   _threads.front().join();
   std::for_each(_threads.begin(), _threads.end(),
                 [](std::thread &t) { t.join(); });
+  std::for_each(_threadAgents.begin(), _threadAgents.end(),
+                [](std::thread &t) { t.join(); });
+
 }
 
 void WaitingArea::simulate() {
 
   for (auto &a : _agents) {
-    _threads.emplace_back(std::thread(&Agent::walk, a));
+    // _threads.emplace_back(std::thread(&Agent::walk, a));
+    _threadAgents.emplace_back(std::thread(&Agent::walk, a));
   }
 
   // Print grid
@@ -317,18 +319,6 @@ void WaitingArea::printWaitingArea() {
     std::cout << printGrid;
     std::cout << "\n";
 
-    // std::string apath_string;
-    // for (auto k : a_path){
-    //   std::string rows;
-    //   for (auto i : k){
-    //     rows += std::to_string(i) + ", ";
-    //   }
-    //   apath_string += rows + "\n";
-    // }
-    // std::cout << "################################################\n";
-    // std::cout << "\n";
-    // std::cout << apath_string;
-    // std::cout << "\n";
   }
 }
 

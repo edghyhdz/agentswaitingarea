@@ -9,11 +9,14 @@ Agent::Agent() {
 }
 
 Agent::Agent(std::shared_ptr<GridCell> position,
-             std::vector<std::shared_ptr<GridCell>> &cells, std::shared_ptr<bool> &openDoor) {
+             std::vector<std::shared_ptr<GridCell>> &cells,
+             std::shared_ptr<bool> &openDoor, int x_goal, int y_goal) {
   std::cout << "Initialized agent with current position id: "
             << position->getID() << ". Coords: ("
             << std::get<0>(position->getCoordinates()) << ", "
             << std::get<1>(position->getCoordinates()) << ")" << std::endl;
+  _x_goal = x_goal;  
+  _y_goal = y_goal;            
   _openDoor = openDoor; 
   _cells = cells;
   _arrivedDestination = false; 

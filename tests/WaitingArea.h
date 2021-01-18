@@ -111,6 +111,7 @@ private:
   std::vector<std::shared_ptr<Agent>> _agents;
   std::string _grid;
   std::vector<std::thread> _threads;
+  std::vector<std::thread> _threadAgents; 
 };
 
 #endif
