@@ -147,17 +147,23 @@ WaitingArea::WaitingArea(int width, int height, int x_exit, int y_exit)
   this->constructArea();
   int agentNumber = 20;
   std::vector<int> randVector; 
+
+  int exitID =( _x_exit * (_y_exit - 1) + _x_exit) - 1; 
+
   for (int i = 0; i < agentNumber; ++i) {
     // Randomly initialize agents on grid
-    std::shared_ptr<GridCell> init_grid;
+    std::shared_ptr<GridCell> init_grid, init_grid_exit;
     std::random_device rd;
     std::mt19937 eng(rd());
     std::uniform_int_distribution<> distr(0, _cells.size() - 1);
     int randNumber = distr(eng); 
 
     init_grid = _cells.at(0);
+    init_grid_exit = _cells.at(exitID); 
+    
     // init_grid = _cells.at(i); 
-    std::shared_ptr<Agent> agent = std::make_shared<Agent>(init_grid, _cells, _openDoors, x_exit, y_exit);
+    std::shared_ptr<Agent> agent = std::make_shared<Agent>(init_grid_exit, _cells, _openDoors, width, height);
+    // std::shared_ptr<Agent> agent = std::make_shared<Agent>(init_grid, _cells, _openDoors, x_exit, y_exit);
     init_grid->updateCell(agent);
     _agents.emplace_back(agent);
 
@@ -241,8 +247,6 @@ std::vector<std::vector<int>> WaitingArea::getAgentGrid(
   return grid; 
 }
 
-// Prints grid area
-// void WaitingArea::printWaitingArea() { std::cout << _grid; }
 void WaitingArea::printWaitingArea() {
 
   // Simulation starting time (approx)
