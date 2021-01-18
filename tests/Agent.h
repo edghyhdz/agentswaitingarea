@@ -39,6 +39,9 @@ public:
   void addToOpen(double x, double y, double g, double h); 
   void expandNeighbors(std::vector<double> &current);
 
+  int getXGoal() { return _x_goal; }; 
+  int getYGoal() { return _y_goal; }; 
+
   // int calculateHeuristic(int x_current, int y_current); 
   // void addToOpen(int x, int y, int g, int h); 
   // void expandNeighbors(std::vector<int> &current);

@@ -147,8 +147,11 @@ void Agent::moveToValidCell() {
     if ((*this->_openDoor)) {
       double x_0, y_0, x_1, y_1, y_diff, x_diff, d_goal;
 
-      x_0 = this->_currentPosition->getXGoal() - 1;
-      y_0 = this->_currentPosition->getYGoal() - 1;
+      x_0 = this->getXGoal() - 1;
+      y_0 = this->getYGoal() - 1;
+
+      // x_0 = this->_currentPosition->getXGoal() - 1;
+      // y_0 = this->_currentPosition->getYGoal() - 1;
       std::vector<double> distVector;
       for (int &cellID : validCells) {
         std::tuple<int, int> tempCoords = _cells.at(cellID)->getCoordinates();
@@ -245,8 +248,11 @@ bool Agent::checkValidCell(int x, int y) {
 }
 
 double Agent::calculateHeuristic(int x_current, int y_current) {
-  return abs(x_current - this->_currentPosition->getXGoal() - 1) +
-         abs(y_current - this->_currentPosition->getYGoal() - 1);
+  // return abs(x_current - this->_currentPosition->getXGoal() - 1) +
+  //        abs(y_current - this->_currentPosition->getYGoal() - 1);
+
+  return abs(x_current - this->getXGoal() - 1) +
+        abs(y_current - this->getYGoal() - 1);
 }
 
 void Agent::addToOpen(double x, double y, double g, double h) {
