@@ -86,8 +86,6 @@ void NCursesDisplay::DisplayAllAgents(
     WINDOW *window, std::shared_ptr<WaitingArea> waitingArea, int n,
     bool &doorsAreOpen, int &waitingTime,
     std::chrono::time_point<std::chrono::system_clock> &simStart, int agentNumber){
-  // wclear(window);
-  std:string placeHString = "*";  
 
   // Fetch agent's grid
   std::vector<std::vector<int>> grid = waitingArea->getAgentGrid(doorsAreOpen, waitingTime, simStart, agentNumber); 
@@ -104,8 +102,8 @@ void NCursesDisplay::DisplayAllAgents(
   int rowCounter = 3; 
   int colCounter = 3;
   int colorDoor = (!doorsAreOpen) ? 3 : 7;
-  int colorAgent; 
-  std::string rowString;
+  int colorAgent, colorSelected; 
+  std::string rowString, agentChar;
 
   for (auto k : grid) {
     rowCounter++;
@@ -128,6 +126,14 @@ void NCursesDisplay::DisplayAllAgents(
         rowString = "X";
         mvwprintw(window, rowCounter, colCounter, rowString.c_str());
         wattroff(window, COLOR_PAIR(colorDoor)); 
+      } else {
+        colorSelected = (l == agentNumber + 20) ? 7: 4; 
+        agentChar = (l == agentNumber + 20) ? to_string(l): "A "; 
+
+        wattron(window, COLOR_PAIR(colorSelected)); 
+        rowString = agentChar;
+        mvwprintw(window, rowCounter, colCounter, rowString.c_str());
+        wattroff(window, COLOR_PAIR(colorSelected)); 
       }
     }
   }

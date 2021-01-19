@@ -17,7 +17,8 @@ void DisplaySystem(WINDOW *window, bool &doorsAreOpen, int &waitingTime,
 void DisplayAllAgents(
     WINDOW *window, std::shared_ptr<WaitingArea> waitingArea, int n,
     bool &doorsAreOpen, int &waitingTime,
-    std::chrono::time_point<std::chrono::system_clock> &simStart);
+    std::chrono::time_point<std::chrono::system_clock> &simStart,
+    int agentNumber);
 void DisplayAStarPath(WINDOW *window, int n, std::shared_ptr<WaitingArea> waitingArea, int agentNumber);
 std::string ProgressBar(float percent);
 }; // namespace NCursesDisplay

@@ -64,10 +64,7 @@ void GridCell::calculateCoordinates() {
 };
 
 int GridCell::getCurrentAgentID(){
-
-  std::shared_ptr<Agent> agent = this->_currentAgent; 
-  
-
+  return this->_currentAgent->getAgentID();
 }
 
 bool GridCell::isExitAgent() { return _currentAgent->isExitAgent(); }
@@ -233,7 +230,7 @@ std::vector<std::vector<int>> WaitingArea::getAgentGrid(
   std::this_thread::sleep_for(std::chrono::milliseconds(1));
   std::vector<std::vector<int>> grid(this->_height,
                                       std::vector<int>(this->_width));
-  int x, y;
+  int x, y, agentCode;
   std::vector<std::vector<int>> a_path;
   for (auto &cell : _cells) {
     std::tuple<int, int> tmp = cell->getCoordinates();
@@ -241,7 +238,8 @@ std::vector<std::vector<int>> WaitingArea::getAgentGrid(
     y = std::get<1>(tmp);
 
     if (cell->cellIsTaken() == true && cell->isExitAgent() == false) {
-      grid[y][x] = 1;
+      agentCode = (cell->getCurrentAgentID() == (agentNumber * 2) - 1 ) ? 4 : 1; 
+      grid[y][x] = cell->getCurrentAgentID();
     } else if (cell->cellIsTaken() == true && cell->isExitAgent() == true) {
       grid[y][x] = 7;
     } else if (y == this->_y_exit - 1 && x == this->_x_exit - 1) {
