@@ -147,7 +147,7 @@ WaitingArea::WaitingArea(int width, int height, int x_exit, int y_exit)
   this->_openDoors = std::make_shared<bool>(false); 
 
   this->constructArea();
-  int agentNumber = 10;
+  int agentNumber = 20;
   std::vector<int> randVector; 
 
   // Get exit cell id

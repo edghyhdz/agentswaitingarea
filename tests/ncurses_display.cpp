@@ -134,10 +134,7 @@ void NCursesDisplay::DisplayProcesses(
 }
 
 // Takes agent 0 and displays his calculated AStar path
-void NCursesDisplay::DisplayAStarPath(WINDOW *window, int n, std::shared_ptr<WaitingArea> waitingArea){
-  // wclear(window);
-  std:string placeHString = "*";  
-
+void NCursesDisplay::DisplayAStarPath(WINDOW *window, int n, std::shared_ptr<WaitingArea> waitingArea, int agentNumber){
   int row{0};
   int const pid_column{2};
 
@@ -145,18 +142,16 @@ void NCursesDisplay::DisplayAStarPath(WINDOW *window, int n, std::shared_ptr<Wai
   // Reference https://knowledge.udacity.com/questions/160777
   // wclear(window);
   wattron(window, COLOR_PAIR(2));
-  mvwprintw(window, ++row, pid_column, "GRAPH STUFF");
+  mvwprintw(window, ++row, pid_column, ("GRAPH STUFF -> AGENT: " + to_string(agentNumber)).c_str());
   wattroff(window, COLOR_PAIR(2));
 
   // Minimum of agents in nAgents
-  int nAgents = 0;
-  std::vector<std::vector<int>> aStarPath  = waitingArea->getAgentsGrid(nAgents);
+  // int nAgents = 0;
+  std::vector<std::vector<int>> aStarPath  = waitingArea->getAgentsGrid(agentNumber);
   std::vector<std::vector<int>> aStarPathR;
-  std::cout << "Size >> " << aStarPath.size()<< std::endl;
 
   // Transpose grid
   if (aStarPath.size() > 0) {
-    std::cout << "Size inner >> " << aStarPath[0].size()<< std::endl;
     for (int i = 0; i < aStarPath[0].size(); i++) {
       std::vector<int> tempRow;
       for (int k = 0; k < aStarPath.size(); k++) {
@@ -168,7 +163,6 @@ void NCursesDisplay::DisplayAStarPath(WINDOW *window, int n, std::shared_ptr<Wai
 
   int rowCounter = 3; 
   int colCounter = 3;
-  // int colorDoor = (!doorsAreOpen) ? 3 : 7;
   std::string rowString;
 
   for (auto k : aStarPathR) {
@@ -196,34 +190,38 @@ void NCursesDisplay::Display(std::shared_ptr<WaitingArea> waitingArea, int n) {
   noecho();       // do not print input values
   cbreak();       // terminate ncurses on ctrl + c
   start_color();  // enable color
-  keypad(stdscr, TRUE); 
+  
   int x_max{getmaxx(stdscr)};
   WINDOW* system_window = newwin(9, x_max - 1, 0, 0);
   WINDOW *process_window =
       newwin(3 + n, x_max -( x_max / 2) - 3, system_window->_maxy + 1, 0);
   WINDOW *graph_window =
       newwin(3 + n, x_max - x_max / 2, system_window->_maxy + 1, x_max / 2 - 1);
-
+  keypad(system_window, true); 
   // start simulation
   waitingArea->simulate(); 
-  
+
+  int maxAgentNumber = waitingArea->getAgentVector().size(); 
+  int agentNumber = 0;  
+
   // Simulation starting time (approx)
   std::chrono::time_point<std::chrono::system_clock> simStart;
   simStart = std::chrono::system_clock::now();
   bool doorsAreOpen = false; 
   int waitingTime = 15000; // Time until train arrival
-  // std::ofstream myfile;
-  // wtimeout(stdscr, 1);
+  std::ofstream myfile;
 
+  wtimeout(system_window, 10);
   while (1) {
-    
-    // if (wgetch(system_window) == KEY_F(1)){
-    //   myfile.open ("testKEY.txt");
-    //   myfile << "PRSSED KEY! " << std::endl; 
-    //   myfile.close();
-    // }
+    switch (wgetch(system_window)) { 
+      case KEY_F0 + 1:
+        agentNumber += (agentNumber < (maxAgentNumber - 1)) ? 1 : -agentNumber;
+        break; 
+      case KEY_F0 + 2:
+        agentNumber -= (agentNumber > 0) ? 1 : -(maxAgentNumber - 1);
+        break; 
+    }
 
-    // std::vector<std::vector<int>> grid = waitingArea->getAgentGrid(doorsAreOpen, waitingTime, simStart); 
     long runSim = std::chrono::duration_cast<std::chrono::milliseconds>(
                         std::chrono::system_clock::now() - simStart)
                         .count();
@@ -237,12 +235,14 @@ void NCursesDisplay::Display(std::shared_ptr<WaitingArea> waitingArea, int n) {
     init_pair(7, COLOR_GREEN, COLOR_WHITE); 
     wclear(process_window);
     wclear(system_window); 
+    wclear(graph_window); 
+
     box(system_window, 0, 0);
     box(process_window, 0, 0);
     box(graph_window, 0, 0);
     DisplaySystem(system_window, doorsAreOpen, waitingTime, runSim, waitingArea); 
     DisplayProcesses(process_window, waitingArea, n, doorsAreOpen, waitingTime, simStart); 
-    DisplayAStarPath(graph_window, n, waitingArea); 
+    DisplayAStarPath(graph_window, n, waitingArea, agentNumber); 
 
     wrefresh(system_window);
     wrefresh(process_window);
