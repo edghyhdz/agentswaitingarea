@@ -14,7 +14,7 @@ namespace NCursesDisplay {
 void Display(std::shared_ptr<WaitingArea> waitingArea, int n = 10);
 void DisplaySystem(WINDOW *window, bool &doorsAreOpen, int &waitingTime,
                    long &runSim, std::shared_ptr<WaitingArea> waitingArea);
-void DisplayProcesses(
+void DisplayAllAgents(
     WINDOW *window, std::shared_ptr<WaitingArea> waitingArea, int n,
     bool &doorsAreOpen, int &waitingTime,
     std::chrono::time_point<std::chrono::system_clock> &simStart);

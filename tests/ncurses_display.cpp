@@ -82,7 +82,7 @@ void NCursesDisplay::DisplaySystem(
   wrefresh(window);
 }
 
-void NCursesDisplay::DisplayProcesses(
+void NCursesDisplay::DisplayAllAgents(
     WINDOW *window, std::shared_ptr<WaitingArea> waitingArea, int n,
     bool &doorsAreOpen, int &waitingTime,
     std::chrono::time_point<std::chrono::system_clock> &simStart){
@@ -282,7 +282,7 @@ void NCursesDisplay::Display(std::shared_ptr<WaitingArea> waitingArea, int n) {
     box(process_window, 0, 0);
     box(graph_window, 0, 0);
     DisplaySystem(system_window, doorsAreOpen, waitingTime, runSim, waitingArea); 
-    DisplayProcesses(process_window, waitingArea, n, doorsAreOpen, waitingTime, simStart); 
+    DisplayAllAgents(process_window, waitingArea, n, doorsAreOpen, waitingTime, simStart); 
     DisplayAStarPath(graph_window, n, waitingArea, agentNumber); 
     wrefresh(system_window);
     wrefresh(process_window);
