@@ -14,7 +14,10 @@ Agent class declaration
 class Agent : public std::enable_shared_from_this<Agent> {
 public:
   Agent();
-  Agent(std::shared_ptr<GridCell> currentPosition, std::vector<std::shared_ptr<GridCell>> &cells, std::shared_ptr<bool> &openDoor, int x_goal, int y_goal, bool exitAgent); 
+  Agent(std::shared_ptr<GridCell> currentPosition,
+        std::vector<std::shared_ptr<GridCell>> &cells,
+        std::shared_ptr<bool> &openDoor, int x_goal, int y_goal, bool exitAgent,
+        int id);
   void setCurrentPosition(std::shared_ptr<GridCell> position);
   void walk();
   void moveToValidCell();
@@ -41,6 +44,7 @@ public:
 
   int getXGoal() { return _x_goal; } 
   int getYGoal() { return _y_goal; }
+  int getAgentID() { return _id; }
   bool isExitAgent() { return _exitAgent; } 
   std::tuple<int, int> getCurrentCoordinates() { return _currentCoords; } 
   void setCurrentCoordinates(std::tuple<int, int> currentCoords); 
@@ -59,13 +63,13 @@ private:
   double _speed;
   std::vector<std::shared_ptr<GridCell>> _cells;
   std::vector<std::vector<double>> _openList; 
-  // std::vector<std::vector<int>> _openList; 
   std::vector<std::vector<int>> _currentGrid; 
   bool _arrivedDestination; 
   std::shared_ptr<bool> _openDoor; 
   int _unitsTilGoal;
   std::vector<std::vector<int>> _aStarPath;
   std::tuple<int, int> _currentCoords; 
+  int _id; 
 };
 
 #endif

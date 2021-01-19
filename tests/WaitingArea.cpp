@@ -63,6 +63,13 @@ void GridCell::calculateCoordinates() {
   }
 };
 
+int GridCell::getCurrentAgentID(){
+
+  std::shared_ptr<Agent> agent = this->_currentAgent; 
+  
+
+}
+
 bool GridCell::isExitAgent() { return _currentAgent->isExitAgent(); }
 
 // Used only to unlock cell
@@ -152,8 +159,9 @@ WaitingArea::WaitingArea(int width, int height, int x_exit, int y_exit)
     init_grid = _cells.at(0);
     init_grid_exit = _cells.at(exitID); 
     
-    // init_grid = _cells.at(i); 
-    std::shared_ptr<Agent> agent = std::make_shared<Agent>(init_grid_exit, _cells, _openDoors, 1, 1, true);
+    // init_grid = _cells.at(i);
+    std::shared_ptr<Agent> agent = std::make_shared<Agent>(
+        init_grid_exit, _cells, _openDoors, 1, 1, true, i);
     init_grid_exit->updateCell(agent);
 
     // std::shared_ptr<Agent> agent = std::make_shared<Agent>(init_grid, _cells, _openDoors, x_exit, y_exit);
@@ -175,7 +183,8 @@ WaitingArea::WaitingArea(int width, int height, int x_exit, int y_exit)
   // Agents going out
   for (int i = 0; i < agentNumber; ++i) {
     init_grid = _cells.at(0);
-    std::shared_ptr<Agent> agent = std::make_shared<Agent>(init_grid, _cells, _openDoors, x_exit, y_exit, false);
+    std::shared_ptr<Agent> agent = std::make_shared<Agent>(
+        init_grid, _cells, _openDoors, x_exit, y_exit, false, i + agentNumber);
     init_grid->updateCell(agent);
     _agents.emplace_back(agent);
   }
@@ -206,7 +215,7 @@ void WaitingArea::simulate() {
 // Get agent grid
 std::vector<std::vector<int>> WaitingArea::getAgentGrid(
     bool &doorsAreOpen, int &waitingTime,
-    std::chrono::time_point<std::chrono::system_clock> &simStart) {
+    std::chrono::time_point<std::chrono::system_clock> &simStart, int agentNumber) {
 
   long runningSim = std::chrono::duration_cast<std::chrono::milliseconds>(
                         std::chrono::system_clock::now() - simStart)

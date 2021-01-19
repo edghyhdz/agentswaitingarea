@@ -85,12 +85,12 @@ void NCursesDisplay::DisplaySystem(
 void NCursesDisplay::DisplayAllAgents(
     WINDOW *window, std::shared_ptr<WaitingArea> waitingArea, int n,
     bool &doorsAreOpen, int &waitingTime,
-    std::chrono::time_point<std::chrono::system_clock> &simStart){
+    std::chrono::time_point<std::chrono::system_clock> &simStart, int agentNumber){
   // wclear(window);
   std:string placeHString = "*";  
 
   // Fetch agent's grid
-  std::vector<std::vector<int>> grid = waitingArea->getAgentGrid(doorsAreOpen, waitingTime, simStart); 
+  std::vector<std::vector<int>> grid = waitingArea->getAgentGrid(doorsAreOpen, waitingTime, simStart, agentNumber); 
 
   int row{0};
   int const pid_column{2};
@@ -282,7 +282,7 @@ void NCursesDisplay::Display(std::shared_ptr<WaitingArea> waitingArea, int n) {
     box(process_window, 0, 0);
     box(graph_window, 0, 0);
     DisplaySystem(system_window, doorsAreOpen, waitingTime, runSim, waitingArea); 
-    DisplayAllAgents(process_window, waitingArea, n, doorsAreOpen, waitingTime, simStart); 
+    DisplayAllAgents(process_window, waitingArea, n, doorsAreOpen, waitingTime, simStart, agentNumber); 
     DisplayAStarPath(graph_window, n, waitingArea, agentNumber); 
     wrefresh(system_window);
     wrefresh(process_window);

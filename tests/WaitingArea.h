@@ -25,8 +25,7 @@ public:
   void permitEntryToFirstInQueue();
 
 private:
-  std::vector<std::shared_ptr<Agent>>
-      _agents; // list of all agents waiting to enter this cellgrid
+  std::vector<std::shared_ptr<Agent>> _agents; // list of all agents waiting to enter this cellgrid
   std::vector<std::promise<void>> _promises; // list of associated promises
   std::mutex _mutex;
 };
@@ -58,6 +57,7 @@ public:
 
   int getXGoal() { return _x_goal; }
   int getYGoal() { return _y_goal; }
+  int getCurrentAgentID(); 
 
   std::shared_ptr<GridCell> get_shared_this() { return shared_from_this(); }
   bool isExitAgent();
@@ -97,7 +97,7 @@ public:
   // Prints waiting area
   std::vector<std::vector<int>>
   getAgentGrid(bool &doorsAreOpen, int &waitingTime,
-               std::chrono::time_point<std::chrono::system_clock> &simStart);
+               std::chrono::time_point<std::chrono::system_clock> &simStart, int agentNumber);
   std::vector<std::vector<int>> getAgentsGrid(int agentID); 
   void printWaitingArea();
   void printAddresses();
