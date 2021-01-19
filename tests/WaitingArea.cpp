@@ -6,7 +6,6 @@
 #include <iostream>
 #include <random>
 #include <thread>
-#include <fstream>
 
 /*
 WaitingAgents member function definitions
@@ -332,11 +331,6 @@ std::vector<std::vector<int>> WaitingArea::getAgentsGrid(int agentID) {
   int x_current = std::get<0>(tempCoords); 
   int y_current = std::get<1>(tempCoords); 
 
-  std::ofstream myfile;
-  myfile.open ("coords.txt", std::ios_base::app);
-  myfile << "(" << std::to_string(x_current) << ", " << y_current << ")" << std::endl; 
-  myfile.close();
-
   std::vector<std::vector<int>> aStarPath;
 
   // Transpose grid
@@ -345,7 +339,7 @@ std::vector<std::vector<int>> WaitingArea::getAgentsGrid(int agentID) {
       std::vector<int> tempRow;
       for (int k = 0; k < grid.size(); k++) {
         if (x_current == k && i == y_current) {
-          tempRow.push_back(6); 
+          tempRow.push_back(6);  // TODO: Change to struct
         } else {
           tempRow.push_back(grid[k][i]);
         }
@@ -353,6 +347,18 @@ std::vector<std::vector<int>> WaitingArea::getAgentsGrid(int agentID) {
       aStarPath.push_back(tempRow);
     }
   }
+
+  if (aStarPath.size() <= 0) {
+    std::vector<int> dim = this->getConstrArea(); 
+    for (int i = 0; i < dim[0]; i++){
+      std::vector<int> tempRow;
+      for (int k = 0; k < dim[1]; k++){
+        tempRow.push_back(0);
+      }
+      aStarPath.push_back(tempRow);
+    }
+  }
+
   return aStarPath; 
 }
 

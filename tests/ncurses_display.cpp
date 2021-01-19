@@ -145,20 +145,26 @@ void NCursesDisplay::DisplayAStarPath(WINDOW *window, int n, std::shared_ptr<Wai
   mvwprintw(window, ++row, pid_column, ("GRAPH STUFF -> AGENT: " + to_string(agentNumber)).c_str());
   wattroff(window, COLOR_PAIR(2));
 
-  std::vector<std::vector<int>> aStarPath  = waitingArea->getAgentsGrid(agentNumber);
+  // int agentSize = waitingArea->getAgentsGrid().size(); 
+  int maxAgentNumber = waitingArea->getAgentVector().size() / 2; 
+  int agentNumberExit = agentNumber + maxAgentNumber; 
+
+
+  std::vector<std::vector<int>> aStarPathEntrance  = waitingArea->getAgentsGrid(agentNumber);
+  std::vector<std::vector<int>> aStarPathExit  = waitingArea->getAgentsGrid(agentNumberExit);
 
   int rowCounter = 3; 
   int colCounter = 3;
   std::string rowString;
 
-  for (auto k : aStarPath) {
+  for (auto k : aStarPathEntrance) {
     rowCounter++;
     colCounter = 3;
     for (auto l : k) {
       colCounter = colCounter + 2;
       if (l == 3) {
         wattron(window, COLOR_PAIR(3));
-        rowString = ".";
+        rowString = "*";
         mvwprintw(window, rowCounter, colCounter, rowString.c_str());
         wattroff(window, COLOR_PAIR(3));
       } else if (l == 5) {
@@ -166,13 +172,18 @@ void NCursesDisplay::DisplayAStarPath(WINDOW *window, int n, std::shared_ptr<Wai
         rowString = "X";
         mvwprintw(window, rowCounter, colCounter, rowString.c_str());
         wattroff(window, COLOR_PAIR(4));
+      } else if (l == 6) {
+        wattron(window, COLOR_PAIR(4));
+        rowString = "A";
+        mvwprintw(window, rowCounter, colCounter, rowString.c_str());
+        wattroff(window, COLOR_PAIR(4));
       } else if (l == 1) {
         wattron(window, COLOR_PAIR(1));
-        rowString = ".";
+        rowString = "*";
         mvwprintw(window, rowCounter, colCounter, rowString.c_str());
         wattroff(window, COLOR_PAIR(1));
       } else {
-        rowString = to_string(l);
+        rowString = ".";
         mvwprintw(window, rowCounter, colCounter, rowString.c_str());
       }
     }
@@ -181,14 +192,14 @@ void NCursesDisplay::DisplayAStarPath(WINDOW *window, int n, std::shared_ptr<Wai
   int colCounterR = 3 + colCounter;
   rowCounter = 3; 
 
-  for (auto k : aStarPath) {
+  for (auto k : aStarPathExit) {
     rowCounter++;
     colCounterR = 3 + colCounter;
     for (auto l : k) {
       colCounterR = colCounterR + 2;
       if (l == 3) {
         wattron(window, COLOR_PAIR(3)); 
-        rowString = ".";
+        rowString = "*";
         mvwprintw(window, rowCounter, colCounterR, rowString.c_str());
         wattroff(window, COLOR_PAIR(3));
       } else if (l == 5) {
@@ -198,11 +209,16 @@ void NCursesDisplay::DisplayAStarPath(WINDOW *window, int n, std::shared_ptr<Wai
         wattroff(window, COLOR_PAIR(4));
       } else if (l == 1) {
         wattron(window, COLOR_PAIR(1));
-        rowString = ".";
+        rowString = "*";
         mvwprintw(window, rowCounter, colCounterR, rowString.c_str());
         wattroff(window, COLOR_PAIR(1));
+      } else if (l == 6) {
+        wattron(window, COLOR_PAIR(4));
+        rowString = "A";
+        mvwprintw(window, rowCounter, colCounterR, rowString.c_str());
+        wattroff(window, COLOR_PAIR(4));
       } else {
-        rowString = to_string(l);
+        rowString = ".";
         mvwprintw(window, rowCounter, colCounterR, rowString.c_str());
       }
     }
@@ -226,7 +242,7 @@ void NCursesDisplay::Display(std::shared_ptr<WaitingArea> waitingArea, int n) {
   // start simulation
   waitingArea->simulate(); 
 
-  int maxAgentNumber = waitingArea->getAgentVector().size(); 
+  int maxAgentNumber = waitingArea->getAgentVector().size() / 2; 
   int agentNumber = 0;  
 
   // Simulation starting time (approx)
@@ -268,7 +284,6 @@ void NCursesDisplay::Display(std::shared_ptr<WaitingArea> waitingArea, int n) {
     DisplaySystem(system_window, doorsAreOpen, waitingTime, runSim, waitingArea); 
     DisplayProcesses(process_window, waitingArea, n, doorsAreOpen, waitingTime, simStart); 
     DisplayAStarPath(graph_window, n, waitingArea, agentNumber); 
-
     wrefresh(system_window);
     wrefresh(process_window);
     wrefresh(graph_window); 

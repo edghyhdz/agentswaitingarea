@@ -90,6 +90,7 @@ public:
   std::vector<std::shared_ptr<GridCell>> getGridVector() { return _cells; }
   std::vector<std::shared_ptr<Agent>> getAgentVector() { return _agents; }
 
+  std::vector<int> getConstrArea() { return {_width, _height}; }; 
   // Creates waiting area
   void constructArea();
   void openDoor(bool open);
