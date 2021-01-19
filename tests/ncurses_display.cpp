@@ -145,8 +145,6 @@ void NCursesDisplay::DisplayAStarPath(WINDOW *window, int n, std::shared_ptr<Wai
   mvwprintw(window, ++row, pid_column, ("GRAPH STUFF -> AGENT: " + to_string(agentNumber)).c_str());
   wattroff(window, COLOR_PAIR(2));
 
-  // Minimum of agents in nAgents
-  // int nAgents = 0;
   std::vector<std::vector<int>> aStarPath  = waitingArea->getAgentsGrid(agentNumber);
   std::vector<std::vector<int>> aStarPathR;
 
@@ -183,6 +181,29 @@ void NCursesDisplay::DisplayAStarPath(WINDOW *window, int n, std::shared_ptr<Wai
       }
     }
   }
+
+  int colCounterR = 3 + colCounter;
+  rowCounter = 3; 
+
+  for (auto k : aStarPathR) {
+    rowCounter++;
+    colCounterR = 3 + colCounter;
+    for (auto l : k) {
+      colCounterR = colCounterR + 2;
+      if (l == 3) {
+        wattron(window, COLOR_PAIR(3)); 
+        rowString = ".";
+        mvwprintw(window, rowCounter, colCounterR, rowString.c_str());
+        wattroff(window, COLOR_PAIR(3));
+      // } else if (l == 3) {
+
+      } else {
+        rowString = to_string(l);
+        mvwprintw(window, rowCounter, colCounterR, rowString.c_str());
+      }
+    }
+  }
+
 }
 
 void NCursesDisplay::Display(std::shared_ptr<WaitingArea> waitingArea, int n) {
