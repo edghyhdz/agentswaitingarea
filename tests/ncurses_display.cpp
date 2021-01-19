@@ -162,7 +162,7 @@ void NCursesDisplay::DisplayAStarPath(WINDOW *window, int n, std::shared_ptr<Wai
   int colCounter = 3;
   std::string rowString;
 
-  for (auto k : aStarPathEntrance) {
+  for (auto k : aStarPathExit) {
     rowCounter++;
     colCounter = 3;
     for (auto l : k) {
@@ -197,7 +197,7 @@ void NCursesDisplay::DisplayAStarPath(WINDOW *window, int n, std::shared_ptr<Wai
   int colCounterR = 3 + colCounter;
   rowCounter = 3; 
 
-  for (auto k : aStarPathExit) {
+  for (auto k : aStarPathEntrance) {
     rowCounter++;
     colCounterR = 3 + colCounter;
     for (auto l : k) {
