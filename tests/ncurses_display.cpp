@@ -103,7 +103,7 @@ void NCursesDisplay::DisplayAllAgents(
   int colCounter = 3;
   int colorDoor = (!doorsAreOpen) ? 3 : 7;
   int colorAgent, colorSelected; 
-  std::string rowString, agentChar;
+  std::string rowString, agentChar; 
 
   for (auto k : grid) {
     rowCounter++;
@@ -127,9 +127,8 @@ void NCursesDisplay::DisplayAllAgents(
         mvwprintw(window, rowCounter, colCounter, rowString.c_str());
         wattroff(window, COLOR_PAIR(colorDoor)); 
       } else {
-        colorSelected = (l == agentNumber + 20) ? 7: 4; 
-        agentChar = (l == agentNumber + 20) ? to_string(l): "A "; 
-
+        colorSelected = (l == agentNumber + 20) ? 7: 4; // TODO: Change the 20 here
+        agentChar = (l == agentNumber + 20) ? to_string(l): "A ";  // TODO: Change the 20 here
         wattron(window, COLOR_PAIR(colorSelected)); 
         rowString = agentChar;
         mvwprintw(window, rowCounter, colCounter, rowString.c_str());
@@ -143,17 +142,19 @@ void NCursesDisplay::DisplayAllAgents(
 void NCursesDisplay::DisplayAStarPath(WINDOW *window, int n, std::shared_ptr<WaitingArea> waitingArea, int agentNumber){
   int row{0};
   int const pid_column{3};
+  int const exit_graph_column{5};
+
+  int maxAgentNumber = waitingArea->getAgentVector().size() / 2; 
+  int agentNumberExit = agentNumber + maxAgentNumber; 
 
   // Modified due to issues not updating properyl
   // Reference https://knowledge.udacity.com/questions/160777
   // wclear(window);
   wattron(window, COLOR_PAIR(2));
-  mvwprintw(window, ++row, pid_column, ("GRAPH STUFF -> AGENT: " + to_string(agentNumber)).c_str());
+  mvwprintw(window, ++row, pid_column, "GRAPH STUFF");
+  mvwprintw(window, ++++row, exit_graph_column, ("Agent: " + to_string(agentNumber + maxAgentNumber)).c_str());
+  mvwprintw(window, row, exit_graph_column + 3 + (maxAgentNumber * 2), ("Agent: " + to_string(agentNumberExit - maxAgentNumber)).c_str());
   wattroff(window, COLOR_PAIR(2));
-
-  // int agentSize = waitingArea->getAgentsGrid().size(); 
-  int maxAgentNumber = waitingArea->getAgentVector().size() / 2; 
-  int agentNumberExit = agentNumber + maxAgentNumber; 
 
   std::vector<std::vector<int>> aStarPathEntrance  = waitingArea->getAgentsGrid(agentNumber);
   std::vector<std::vector<int>> aStarPathExit  = waitingArea->getAgentsGrid(agentNumberExit);
@@ -279,6 +280,7 @@ void NCursesDisplay::Display(std::shared_ptr<WaitingArea> waitingArea, int n) {
     init_pair(5, COLOR_CYAN, COLOR_BLACK);
     init_pair(6, COLOR_MAGENTA, COLOR_BLACK);
     init_pair(7, COLOR_GREEN, COLOR_WHITE); 
+    init_pair(8, COLOR_WHITE, COLOR_GREEN); 
     wclear(process_window);
     wclear(system_window); 
     wclear(graph_window); 
