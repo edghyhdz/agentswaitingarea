@@ -136,7 +136,7 @@ void NCursesDisplay::DisplayProcesses(
 // Takes agent 0 and displays his calculated AStar path
 void NCursesDisplay::DisplayAStarPath(WINDOW *window, int n, std::shared_ptr<WaitingArea> waitingArea, int agentNumber){
   int row{0};
-  int const pid_column{2};
+  int const pid_column{3};
 
   // Modified due to issues not updating properyl
   // Reference https://knowledge.udacity.com/questions/160777
@@ -146,35 +146,31 @@ void NCursesDisplay::DisplayAStarPath(WINDOW *window, int n, std::shared_ptr<Wai
   wattroff(window, COLOR_PAIR(2));
 
   std::vector<std::vector<int>> aStarPath  = waitingArea->getAgentsGrid(agentNumber);
-  std::vector<std::vector<int>> aStarPathR;
-
-  // Transpose grid
-  if (aStarPath.size() > 0) {
-    for (int i = 0; i < aStarPath[0].size(); i++) {
-      std::vector<int> tempRow;
-      for (int k = 0; k < aStarPath.size(); k++) {
-        tempRow.push_back(aStarPath[k][i]);
-      }
-      aStarPathR.push_back(tempRow);
-    }
-  }
 
   int rowCounter = 3; 
   int colCounter = 3;
   std::string rowString;
 
-  for (auto k : aStarPathR) {
+  for (auto k : aStarPath) {
     rowCounter++;
     colCounter = 3;
     for (auto l : k) {
       colCounter = colCounter + 2;
       if (l == 3) {
-        wattron(window, COLOR_PAIR(3)); 
+        wattron(window, COLOR_PAIR(3));
         rowString = ".";
         mvwprintw(window, rowCounter, colCounter, rowString.c_str());
         wattroff(window, COLOR_PAIR(3));
-      // } else if (l == 3) {
-
+      } else if (l == 5) {
+        wattron(window, COLOR_PAIR(4));
+        rowString = "X";
+        mvwprintw(window, rowCounter, colCounter, rowString.c_str());
+        wattroff(window, COLOR_PAIR(4));
+      } else if (l == 1) {
+        wattron(window, COLOR_PAIR(1));
+        rowString = ".";
+        mvwprintw(window, rowCounter, colCounter, rowString.c_str());
+        wattroff(window, COLOR_PAIR(1));
       } else {
         rowString = to_string(l);
         mvwprintw(window, rowCounter, colCounter, rowString.c_str());
@@ -185,7 +181,7 @@ void NCursesDisplay::DisplayAStarPath(WINDOW *window, int n, std::shared_ptr<Wai
   int colCounterR = 3 + colCounter;
   rowCounter = 3; 
 
-  for (auto k : aStarPathR) {
+  for (auto k : aStarPath) {
     rowCounter++;
     colCounterR = 3 + colCounter;
     for (auto l : k) {
@@ -195,8 +191,16 @@ void NCursesDisplay::DisplayAStarPath(WINDOW *window, int n, std::shared_ptr<Wai
         rowString = ".";
         mvwprintw(window, rowCounter, colCounterR, rowString.c_str());
         wattroff(window, COLOR_PAIR(3));
-      // } else if (l == 3) {
-
+      } else if (l == 5) {
+        wattron(window, COLOR_PAIR(4));
+        rowString = "X";
+        mvwprintw(window, rowCounter, colCounterR, rowString.c_str());
+        wattroff(window, COLOR_PAIR(4));
+      } else if (l == 1) {
+        wattron(window, COLOR_PAIR(1));
+        rowString = ".";
+        mvwprintw(window, rowCounter, colCounterR, rowString.c_str());
+        wattroff(window, COLOR_PAIR(1));
       } else {
         rowString = to_string(l);
         mvwprintw(window, rowCounter, colCounterR, rowString.c_str());

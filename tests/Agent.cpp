@@ -75,6 +75,10 @@ void Agent::setAStarPath(std::vector<std::vector<int>> currentGrid){
   this->_aStarPath = _currentGrid; 
 }
 
+void Agent::setCurrentCoordinates(std::tuple<int, int> currentCoords) {
+  _currentCoords = currentCoords; 
+}; 
+
 void Agent::moveToValidCell() {
   // Every Step, agent calculates path
   this->Search();
@@ -96,6 +100,8 @@ void Agent::moveToValidCell() {
   std::shared_ptr<GridCell> nextGrid;
 
   std::tuple<int, int> coordinates = this->_currentPosition->getCoordinates();
+  // Set current coordinates for waitingArea
+  this->setCurrentCoordinates(coordinates); 
   int x_this = std::get<0>(coordinates);
   int y_this = std::get<1>(coordinates);
   bool foundCell = false;
@@ -155,8 +161,6 @@ void Agent::moveToValidCell() {
       x_0 = this->getXGoal() - 1;
       y_0 = this->getYGoal() - 1;
 
-      // x_0 = this->_currentPosition->getXGoal() - 1;
-      // y_0 = this->_currentPosition->getYGoal() - 1;
       std::vector<double> distVector;
       for (int &cellID : validCells) {
         std::tuple<int, int> tempCoords = _cells.at(cellID)->getCoordinates();

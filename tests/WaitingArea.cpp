@@ -81,19 +81,7 @@ void GridCell::addAgentToQueue(std::shared_ptr<Agent> agent) {
   std::future<void> ftr = prms.get_future(); 
   _waitingAgents.pushBack(agent, std::move(prms)); 
   // Wait until agent is allowed to enter
-  std::ofstream myfile;
-  std::tuple<int, int> tempCoords = this->getCoordinates();
-  int x_this = std::get<0>(tempCoords);
-  int y_this = std::get<1>(tempCoords);
-  // myfile.open ("BLOCKEDCELLS.txt", std::ios_base::app);
-  // myfile << "Cell " << this->getID() << ", coords: (" << x_this << ", " << y_this << ")" << " entered to limbo\n" << std::endl; 
-  // myfile.close();
-
   ftr.wait();
-  // myfile.open ("BLOCKEDCELLS.txt", std::ios_base::app);
-  // myfile << "Cell " << this->getID() << " exitedlimbo\n" << std::endl; 
-  // myfile.close();
-
 }
 
 void GridCell::processAgentQueue(){
@@ -337,7 +325,35 @@ void WaitingArea::printWaitingArea() {
 }
 
 std::vector<std::vector<int>> WaitingArea::getAgentsGrid(int agentID) { 
-  return this->_agents.at(agentID)->getAStarPath(); 
+  
+  std::shared_ptr<Agent> agent = this->_agents.at(agentID); 
+  std::vector<std::vector<int>> grid = agent->getAStarPath();
+  std::tuple<int, int> tempCoords = agent->getCurrentCoordinates();
+  int x_current = std::get<0>(tempCoords); 
+  int y_current = std::get<1>(tempCoords); 
+
+  std::ofstream myfile;
+  myfile.open ("coords.txt", std::ios_base::app);
+  myfile << "(" << std::to_string(x_current) << ", " << y_current << ")" << std::endl; 
+  myfile.close();
+
+  std::vector<std::vector<int>> aStarPath;
+
+  // Transpose grid
+  if (grid.size() > 0) {
+    for (int i = 0; i < grid[0].size(); i++) {
+      std::vector<int> tempRow;
+      for (int k = 0; k < grid.size(); k++) {
+        if (x_current == k && i == y_current) {
+          tempRow.push_back(6); 
+        } else {
+          tempRow.push_back(grid[k][i]);
+        }
+      }
+      aStarPath.push_back(tempRow);
+    }
+  }
+  return aStarPath; 
 }
 
 // Prints addresses of each cell from grid

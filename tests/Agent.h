@@ -42,6 +42,8 @@ public:
   int getXGoal() { return _x_goal; } 
   int getYGoal() { return _y_goal; }
   bool isExitAgent() { return _exitAgent; } 
+  std::tuple<int, int> getCurrentCoordinates() { return _currentCoords; } 
+  void setCurrentCoordinates(std::tuple<int, int> currentCoords); 
 
   // int calculateHeuristic(int x_current, int y_current); 
   // void addToOpen(int x, int y, int g, int h); 
@@ -63,6 +65,7 @@ private:
   std::shared_ptr<bool> _openDoor; 
   int _unitsTilGoal;
   std::vector<std::vector<int>> _aStarPath;
+  std::tuple<int, int> _currentCoords; 
 };
 
 #endif
