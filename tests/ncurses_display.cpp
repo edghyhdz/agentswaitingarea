@@ -36,7 +36,7 @@ std::string NCursesDisplay::ProgressBar(float percent) {
   return result + " " + display + "/100%";
 }
 
-void NCursesDisplay::DisplaySystem(
+void NCursesDisplay::DisplayStats(
     WINDOW *window, bool &doorsAreOpen, int &waitingTime, long & runSim, std::shared_ptr<WaitingArea> waitingArea) {
   int row{0};
   std::string doorsOpenMessage; 
@@ -154,7 +154,6 @@ void NCursesDisplay::DisplayAStarPath(WINDOW *window, int n, std::shared_ptr<Wai
   // int agentSize = waitingArea->getAgentsGrid().size(); 
   int maxAgentNumber = waitingArea->getAgentVector().size() / 2; 
   int agentNumberExit = agentNumber + maxAgentNumber; 
-
 
   std::vector<std::vector<int>> aStarPathEntrance  = waitingArea->getAgentsGrid(agentNumber);
   std::vector<std::vector<int>> aStarPathExit  = waitingArea->getAgentsGrid(agentNumberExit);
@@ -287,7 +286,7 @@ void NCursesDisplay::Display(std::shared_ptr<WaitingArea> waitingArea, int n) {
     box(system_window, 0, 0);
     box(process_window, 0, 0);
     box(graph_window, 0, 0);
-    DisplaySystem(system_window, doorsAreOpen, waitingTime, runSim, waitingArea); 
+    DisplayStats(system_window, doorsAreOpen, waitingTime, runSim, waitingArea); 
     DisplayAllAgents(process_window, waitingArea, n, doorsAreOpen, waitingTime, simStart, agentNumber); 
     DisplayAStarPath(graph_window, n, waitingArea, agentNumber); 
     wrefresh(system_window);
