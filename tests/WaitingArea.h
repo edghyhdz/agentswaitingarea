@@ -100,7 +100,6 @@ public:
                std::chrono::time_point<std::chrono::system_clock> &simStart, int agentNumber);
   std::vector<std::vector<int>> getAgentsGrid(int agentID); 
   void printWaitingArea();
-  void printAddresses();
   void simulate();
 
 private:

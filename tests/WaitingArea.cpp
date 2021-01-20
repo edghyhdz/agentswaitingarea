@@ -238,14 +238,13 @@ std::vector<std::vector<int>> WaitingArea::getAgentGrid(
     y = std::get<1>(tmp);
 
     if (cell->cellIsTaken() == true && cell->isExitAgent() == false) {
-      agentCode = (cell->getCurrentAgentID() == (agentNumber * 2) - 1 ) ? 4 : 1; 
-      grid[y][x] = cell->getCurrentAgentID();
+      grid[y][x] = cell->getCurrentAgentID(); // Give agent ID
     } else if (cell->cellIsTaken() == true && cell->isExitAgent() == true) {
-      grid[y][x] = 7;
+      grid[y][x] = 7; // 
     } else if (y == this->_y_exit - 1 && x == this->_x_exit - 1) {
-      grid[y][x] = 2;
+      grid[y][x] = AgentPosition::GOAL;  // Exit from waitingArea
     } else {
-      grid[y][x] = 0;
+      grid[y][x] = 0;  // Other unvisited cell from grid
     }
   }
   return grid; 
@@ -346,7 +345,7 @@ std::vector<std::vector<int>> WaitingArea::getAgentsGrid(int agentID) {
       std::vector<int> tempRow;
       for (int k = 0; k < grid.size(); k++) {
         if (x_current == k && i == y_current) {
-          tempRow.push_back(6);  // TODO: Change to struct
+          tempRow.push_back(AgentPosition::CURRENT_AGENT);  // TODO: Change to struct
         } else {
           tempRow.push_back(grid[k][i]);
         }
@@ -367,14 +366,6 @@ std::vector<std::vector<int>> WaitingArea::getAgentsGrid(int agentID) {
   }
 
   return aStarPath; 
-}
-
-// Prints addresses of each cell from grid
-void WaitingArea::printAddresses() {
-  for (auto it : this->_cells) {
-    std::cout << "Address cell id: " << it->getID() << ", " << it.get()
-              << std::endl;
-  }
 }
 
 // // Test stuff

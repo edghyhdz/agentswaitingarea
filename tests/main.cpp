@@ -11,7 +11,6 @@ g++ main.cpp Agent.h Agent.cpp WaitingArea.h WaitingArea.cpp ncurses_display.h n
 int main() {
   
   int width, height, x, y;
-//   std::cin >> width >> height >> x >> y;
   width = 20; 
   height = 20;
   x = 10; 

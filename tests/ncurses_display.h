@@ -7,8 +7,6 @@
 #include <iostream>
 #include <string>
 #include <thread>
-// #include "process.h"
-// #include "system.h"
 
 namespace NCursesDisplay {
 void Display(std::shared_ptr<WaitingArea> waitingArea, int n = 10);

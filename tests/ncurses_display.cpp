@@ -59,7 +59,6 @@ void NCursesDisplay::DisplayStats(
     }
   }
 
-  std::string testString = "x"; 
   mvwprintw(window, ++row, 2, ("Status: " + doorsOpenMessage).c_str());
   mvwprintw(window, ++row, 2, ("Doors opened for: " + to_string(oDoorsTime) + " seconds.").c_str());
   mvwprintw(window, ++row, 2, ("Agents simulated: " + to_string(agents.size())).c_str());
@@ -78,7 +77,6 @@ void NCursesDisplay::DisplayStats(
   mvwprintw(
       window, ++row, 2,
       ("Running Processes: " + to_string(40)).c_str());
-  mvwprintw(window, ++row, 2, ("Up Time: " + testString).c_str());
   wrefresh(window);
 }
 
@@ -91,12 +89,12 @@ void NCursesDisplay::DisplayAllAgents(
   std::vector<std::vector<int>> grid = waitingArea->getAgentGrid(doorsAreOpen, waitingTime, simStart, agentNumber); 
 
   int row{0};
-  int const pid_column{2};
-  // Modified due to issues not updating properyl
-  // Reference https://knowledge.udacity.com/questions/160777
-  // wclear(window);
+  int const title_column{2};
+  int maxAgentNumber = waitingArea->getAgentVector().size() / 2; 
+  int agentNumberExit = agentNumber + maxAgentNumber; 
+
   wattron(window, COLOR_PAIR(2));
-  mvwprintw(window, ++row, pid_column, "WAITING AREA SIMULATION");
+  mvwprintw(window, ++row, title_column, "WAITING AREA SIMULATION");
   wattroff(window, COLOR_PAIR(2));
 
   int rowCounter = 3; 
@@ -115,20 +113,23 @@ void NCursesDisplay::DisplayAllAgents(
         mvwprintw(window, rowCounter, colCounter, rowString.c_str());
       } else if (l == 1 || l == 7) {
         colorAgent = (l == 1) ? 4 : 3;
-
         wattron(window, COLOR_PAIR(colorAgent)); 
         rowString = "A ";
         mvwprintw(window, rowCounter, colCounter, rowString.c_str());
         wattroff(window, COLOR_PAIR(colorAgent)); 
-
-      } else if (l == 2) {
+      } else if (l == AgentPosition::GOAL) {
         wattron(window, COLOR_PAIR(colorDoor)); 
-        rowString = "X";
+        rowString = AgentPosition::terminalCode(l);
         mvwprintw(window, rowCounter, colCounter, rowString.c_str());
         wattroff(window, COLOR_PAIR(colorDoor)); 
+      } else if (l == agentNumber){
+        rowString = to_string(l);
+        wattron(window, COLOR_PAIR(8)); 
+        mvwprintw(window, rowCounter, colCounter, rowString.c_str());
+        wattroff(window, COLOR_PAIR(8)); 
       } else {
-        colorSelected = (l == agentNumber + 20) ? 7: 4; // TODO: Change the 20 here
-        agentChar = (l == agentNumber + 20) ? to_string(l): "A ";  // TODO: Change the 20 here
+        colorSelected = (l == agentNumber + maxAgentNumber) ? 7: 4; 
+        agentChar = (l == agentNumber + maxAgentNumber) ? to_string(l): "A "; 
         wattron(window, COLOR_PAIR(colorSelected)); 
         rowString = agentChar;
         mvwprintw(window, rowCounter, colCounter, rowString.c_str());
@@ -141,17 +142,14 @@ void NCursesDisplay::DisplayAllAgents(
 // Takes agent 0 and displays his calculated AStar path
 void NCursesDisplay::DisplayAStarPath(WINDOW *window, int n, std::shared_ptr<WaitingArea> waitingArea, int agentNumber){
   int row{0};
-  int const pid_column{3};
+  int const title_column{3};
   int const exit_graph_column{5};
 
   int maxAgentNumber = waitingArea->getAgentVector().size() / 2; 
   int agentNumberExit = agentNumber + maxAgentNumber; 
 
-  // Modified due to issues not updating properyl
-  // Reference https://knowledge.udacity.com/questions/160777
-  // wclear(window);
   wattron(window, COLOR_PAIR(2));
-  mvwprintw(window, ++row, pid_column, "GRAPH STUFF");
+  mvwprintw(window, ++row, title_column, "GRAPH STUFF");
   mvwprintw(window, ++++row, exit_graph_column, ("Agent: " + to_string(agentNumber + maxAgentNumber)).c_str());
   mvwprintw(window, row, exit_graph_column + 3 + (maxAgentNumber * 2), ("Agent: " + to_string(agentNumberExit - maxAgentNumber)).c_str());
   wattroff(window, COLOR_PAIR(2));
@@ -163,38 +161,40 @@ void NCursesDisplay::DisplayAStarPath(WINDOW *window, int n, std::shared_ptr<Wai
   int colCounter = 3;
   std::string rowString;
 
+  // Draw exit aStarPath 
   for (auto k : aStarPathExit) {
     rowCounter++;
     colCounter = 3;
     for (auto l : k) {
       colCounter = colCounter + 2;
-      if (l == 3) {
+      if (l == AgentPosition::FOUND_PATH) {
         wattron(window, COLOR_PAIR(3));
-        rowString = "*";
+        rowString = AgentPosition::terminalCode(l);
         mvwprintw(window, rowCounter, colCounter, rowString.c_str());
         wattroff(window, COLOR_PAIR(3));
-      } else if (l == 5) {
+      } else if (l == AgentPosition::GOAL) {
         wattron(window, COLOR_PAIR(4));
-        rowString = "X";
+        rowString = AgentPosition::terminalCode(l);
         mvwprintw(window, rowCounter, colCounter, rowString.c_str());
         wattroff(window, COLOR_PAIR(4));
-      } else if (l == 6) {
+      } else if (l == AgentPosition::CURRENT_AGENT) {
         wattron(window, COLOR_PAIR(4));
-        rowString = "A";
+        rowString = AgentPosition::terminalCode(l);
         mvwprintw(window, rowCounter, colCounter, rowString.c_str());
         wattroff(window, COLOR_PAIR(4));
-      } else if (l == 1) {
+      } else if (l == AgentPosition::CLOSED) {
         wattron(window, COLOR_PAIR(1));
-        rowString = "*";
+        rowString = AgentPosition::terminalCode(l);
         mvwprintw(window, rowCounter, colCounter, rowString.c_str());
         wattroff(window, COLOR_PAIR(1));
       } else {
-        rowString = ".";
+        rowString = AgentPosition::terminalCode(l);
         mvwprintw(window, rowCounter, colCounter, rowString.c_str());
       }
     }
   }
 
+  // Draw entrance aStarPath
   int colCounterR = 3 + colCounter;
   rowCounter = 3; 
 
@@ -203,33 +203,32 @@ void NCursesDisplay::DisplayAStarPath(WINDOW *window, int n, std::shared_ptr<Wai
     colCounterR = 3 + colCounter;
     for (auto l : k) {
       colCounterR = colCounterR + 2;
-      if (l == 3) {
+      if (l == AgentPosition::FOUND_PATH) {
         wattron(window, COLOR_PAIR(3)); 
-        rowString = "*";
+        rowString = AgentPosition::terminalCode(l);
         mvwprintw(window, rowCounter, colCounterR, rowString.c_str());
         wattroff(window, COLOR_PAIR(3));
-      } else if (l == 5) {
+      } else if (l == AgentPosition::GOAL) {
         wattron(window, COLOR_PAIR(4));
-        rowString = "X";
+        rowString = AgentPosition::terminalCode(l);
         mvwprintw(window, rowCounter, colCounterR, rowString.c_str());
         wattroff(window, COLOR_PAIR(4));
-      } else if (l == 1) {
+      } else if (l == AgentPosition::CLOSED) {
         wattron(window, COLOR_PAIR(1));
-        rowString = "*";
+        rowString = AgentPosition::terminalCode(l);
         mvwprintw(window, rowCounter, colCounterR, rowString.c_str());
         wattroff(window, COLOR_PAIR(1));
-      } else if (l == 6) {
+      } else if (l == AgentPosition::CURRENT_AGENT) {
         wattron(window, COLOR_PAIR(4));
-        rowString = "A";
+        rowString = AgentPosition::terminalCode(l);
         mvwprintw(window, rowCounter, colCounterR, rowString.c_str());
         wattroff(window, COLOR_PAIR(4));
       } else {
-        rowString = ".";
+        rowString = AgentPosition::terminalCode(l);
         mvwprintw(window, rowCounter, colCounterR, rowString.c_str());
       }
     }
   }
-
 }
 
 void NCursesDisplay::Display(std::shared_ptr<WaitingArea> waitingArea, int n) {
