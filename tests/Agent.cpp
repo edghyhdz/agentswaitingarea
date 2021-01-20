@@ -32,8 +32,6 @@ Agent::Agent(std::shared_ptr<GridCell> position,
 
   _speed = double(distr(eng))/100.0; 
   std::cout << "speed: " << this->_unitsTilGoal<< ", random: "<< double(distr(eng))/100 <<std::endl; 
-
-  // _speed = 0.5;
 }
 
 // setters
@@ -85,8 +83,9 @@ void Agent::moveToValidCell() {
   this->Search();
 
   // Adds some randomness to the movement of the agent
-  if (this->_unitsTilGoal>this->getUnitsUntilGoal() && *this->_openDoor == false){
-    return; 
+  if (this->getUnitsUntilGoal() < 10 &&
+      *this->_openDoor == false) {
+    return;
   }
 
   // Only to mark path that agent should follow
@@ -116,7 +115,7 @@ void Agent::moveToValidCell() {
                 (this->_currentPosition->getX() - x_1);
 
     // Check first if cells are on grid and if they
-    // have value = 3, meaning they are found a* path
+    // have value = FOUND_PATH
     bool on_grid_x = (x_1 >= 0 && x_1 < this->_currentPosition->getX());
     bool on_grid_y = (y_1 >= 0 && y_1 < this->_currentPosition->getY());
     
@@ -125,14 +124,15 @@ void Agent::moveToValidCell() {
 
       bool cellTaken = this->_cells.at(cellID)->cellIsTaken();
 
-      if (_currentGrid[x_1][y_1] == 3 && this->_arrivedDestination == false &&
-          cellTaken == false) {
+      if (_currentGrid[x_1][y_1] == AgentPosition::FOUND_PATH &&
+          this->_arrivedDestination == false && cellTaken == false) {
         foundCell = true;
 
         // Vector of valid cells to move to
         validCells.push_back(cellID);
-      }
-      else if (_currentGrid[x_1][y_1] == 5 && this->_arrivedDestination==false && (*this->_openDoor)==true) {
+      } else if (_currentGrid[x_1][y_1] == AgentPosition::GOAL &&
+                 this->_arrivedDestination == false &&
+                 (*this->_openDoor) == true) {
         // Put cell back again until granted access
         std::cout << "Agent arrived to destination" << std::endl; 
 
@@ -213,7 +213,7 @@ int Agent::getUnitsUntilGoal(){
   int totalUnits = 0; 
   for (auto &i : this->_currentGrid){
     for (auto &k : i){
-      if (k == 3) {
+      if (k == AgentPosition::FOUND_PATH) {
         totalUnits++; 
       }
     }
@@ -233,9 +233,7 @@ void Agent::setCurrentGrid() {
     x = std::get<0>(tmp);
     y = std::get<1>(tmp);
     if (cell->cellIsTaken()) {
-      _currentGrid[x][y] = 0;
-    } else {
-      _currentGrid[x][y] = 0;
+      _currentGrid[x][y] = AgentPosition::NOT_VISITED;
     }
   }
 }
@@ -253,7 +251,7 @@ bool Agent::checkValidCell(int x, int y) {
   bool on_grid_x = (x >= 0 && x < this->_currentPosition->getX());
   bool on_grid_y = (y >= 0 && y < this->_currentPosition->getY());
   if (on_grid_x && on_grid_y)
-    return _currentGrid[x][y] == 0;
+    return _currentGrid[x][y] == AgentPosition::NOT_VISITED; // Non visited gridcell
   return false;
 }
 
@@ -267,7 +265,7 @@ double Agent::calculateHeuristic(int x_current, int y_current) {
 
 void Agent::addToOpen(double x, double y, double g, double h) {
   _openList.push_back(std::vector<double>{x, y, g, h});
-  _currentGrid[x][y] = 1; // Closed
+  _currentGrid[x][y] = AgentPosition::CLOSED; // Closed
 }
 
 void Agent::expandNeighbors(std::vector<double> &current) {
@@ -315,15 +313,13 @@ void Agent::Search() {
     _openList.pop_back();
     x = current[0];
     y = current[1];
-    _currentGrid[x][y] = 3;
+    _currentGrid[x][y] = AgentPosition::FOUND_PATH;
 
     // Check if we're done.
     if (x == this->getXGoal() - 1 &&
         y == this->getYGoal() - 1) {
-    // if (x == this->_currentPosition->getXGoal() - 1 &&
-    //     y == this->_currentPosition->getYGoal() - 1) {
-      _currentGrid[std::get<0>(coords)][std::get<1>(coords)] = 0;
-      _currentGrid[x][y] = 5;
+      _currentGrid[std::get<0>(coords)][std::get<1>(coords)] = AgentPosition::NOT_VISITED;
+      _currentGrid[x][y] = AgentPosition::GOAL;
       break;
     }
 

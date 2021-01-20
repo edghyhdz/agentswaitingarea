@@ -8,6 +8,34 @@
 // directional deltas
 const int delta[4][2]{{-1, 0}, {0, -1}, {1, 0}, {0, 1}};
 
+// Agent positional deffinitions
+struct AgentPosition {
+public:
+  enum Constants {
+    GOAL = 5,
+    CLOSED = 1,
+    NOT_VISITED = 0,
+    FOUND_PATH = 3,
+    CURRENT_AGENT = 6,
+
+  };
+
+  static std::string terminalCode(int const position) {
+    switch (position) {
+    case GOAL:
+      return "X ";
+    case FOUND_PATH:
+      return "* ";
+    case CLOSED:
+      return "* ";
+    case CURRENT_AGENT:
+      return "A ";
+    default:
+      return ". ";
+    }
+  }
+};
+
 /*
 Agent class declaration
 */
