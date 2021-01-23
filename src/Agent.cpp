@@ -94,7 +94,6 @@ void Agent::moveToValidCell() {
 
   std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
-  // here
   _openList.clear();
 
   std::shared_ptr<GridCell> nextGrid;
@@ -256,9 +255,6 @@ bool Agent::checkValidCell(int x, int y) {
 }
 
 double Agent::calculateHeuristic(int x_current, int y_current) {
-  // return abs(x_current - this->_currentPosition->getXGoal() - 1) +
-  //        abs(y_current - this->_currentPosition->getYGoal() - 1);
-
   return abs(x_current - this->getXGoal() - 1) +
         abs(y_current - this->getYGoal() - 1);
 }

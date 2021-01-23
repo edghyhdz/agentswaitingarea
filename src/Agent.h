@@ -17,7 +17,7 @@ public:
     NOT_VISITED = 0,
     FOUND_PATH = 3,
     CURRENT_AGENT = 6,
-    NOT_VISITED_TERMINAL = 188  // terminal formatting
+    NOT_VISITED_F = 188  // terminal formatting
 
   };
 
@@ -57,14 +57,12 @@ public:
   void setCurrentGrid();
   void arrivedToDestination(){ _arrivedDestination=true; }
   int getUnitsUntilGoal(); 
-  // void setPreviousPosition(std::shared_ptr<GridCell> position);
   std::shared_ptr<Agent> get_shared_this() { return shared_from_this(); }
   std::vector<std::vector<int>> getAStarPath() { return _aStarPath; }
   void setAStarPath(std::vector<std::vector<int>> currentGrid); 
 
   // Related to A* search
   void cellSort(std::vector<std::vector<double>> *v);
-  // void cellSort(std::vector<std::vector<int>> *v);
   bool checkValidCell(int x, int y); 
   // Calculate the manhattan distance
   double calculateHeuristic(int x_current, int y_current); 
@@ -77,10 +75,6 @@ public:
   bool isExitAgent() { return _exitAgent; } 
   std::tuple<int, int> getCurrentCoordinates() { return _currentCoords; } 
   void setCurrentCoordinates(std::tuple<int, int> currentCoords); 
-
-  // int calculateHeuristic(int x_current, int y_current); 
-  // void addToOpen(int x, int y, int g, int h); 
-  // void expandNeighbors(std::vector<int> &current);
   void Search(); 
 
 private:

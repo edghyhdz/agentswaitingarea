@@ -42,7 +42,7 @@ void NCursesDisplay::DisplayStats(
   std::string doorsOpenMessage; 
   std::vector<std::shared_ptr<Agent>>  agents; 
   agents = waitingArea->getAgentVector();  
-  long oDoorsTime = 0.0; 
+  long oDoorsTime = 0.0;  // 0 until doors are opened
 
   if (!doorsAreOpen) {
     doorsOpenMessage = "Train arrives in " + to_string((waitingTime - runSim) / 1000) + " seconds."; 
@@ -108,7 +108,7 @@ void NCursesDisplay::DisplayAllAgents(
     colCounter = 3;
     for (auto l : k) {
       colCounter = colCounter + 2;
-      if (l == AgentPosition::NOT_VISITED_TERMINAL) {
+      if (l == AgentPosition::NOT_VISITED_F) {
         rowString = AgentPosition::terminalCode(l);
         mvwprintw(window, rowCounter, colCounter, rowString.c_str());
       // } else if (l == 1 || l == 7) {
@@ -122,13 +122,18 @@ void NCursesDisplay::DisplayAllAgents(
         rowString = AgentPosition::terminalCode(l);
         mvwprintw(window, rowCounter, colCounter, rowString.c_str());
         wattroff(window, COLOR_PAIR(colorDoor)); 
+        // For agentNumber in range of 0 -> maxAgentNumber / 2
       } else if (l == agentNumber){
         rowString = to_string(l);
         wattron(window, COLOR_PAIR(8)); 
         mvwprintw(window, rowCounter, colCounter, rowString.c_str());
-        wattroff(window, COLOR_PAIR(8)); 
+        wattroff(window, COLOR_PAIR(8));
+        // For agentNumber in range of maxAgentNumber / 2 -> maxAgentNumber
       } else {
-        colorSelected = (l == agentNumber + maxAgentNumber) ? 7: 4; 
+        colorSelected = (l == agentNumber + maxAgentNumber) ? 7 : 4;
+        if (colorSelected == 4) {
+          colorSelected = (l < maxAgentNumber) ? 4 : 5;
+        }
         agentChar = (l == agentNumber + maxAgentNumber) ? to_string(l): "A "; 
         wattron(window, COLOR_PAIR(colorSelected)); 
         rowString = agentChar;

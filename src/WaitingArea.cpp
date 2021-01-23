@@ -244,7 +244,7 @@ std::vector<std::vector<int>> WaitingArea::getAgentGrid(
     } else if (y == this->_y_exit - 1 && x == this->_x_exit - 1) {
       grid[y][x] = AgentPosition::GOAL;  // Exit from waitingArea
     } else {
-      grid[y][x] = AgentPosition::NOT_VISITED_TERMINAL;  // Other unvisited cell from grid
+      grid[y][x] = AgentPosition::NOT_VISITED_F;  // Other unvisited cell from grid
     }
   }
   return grid; 
