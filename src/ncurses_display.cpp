@@ -83,25 +83,27 @@ void NCursesDisplay::DisplayStats(
 void NCursesDisplay::DisplayAllAgents(
     WINDOW *window, std::shared_ptr<WaitingArea> waitingArea, int n,
     bool &doorsAreOpen, int &waitingTime,
-    std::chrono::time_point<std::chrono::system_clock> &simStart, int agentNumber){
+    std::chrono::time_point<std::chrono::system_clock> &simStart,
+    int agentNumber) {
 
   // Fetch agent's grid
-  std::vector<std::vector<int>> grid = waitingArea->getAgentGrid(doorsAreOpen, waitingTime, simStart, agentNumber); 
+  std::vector<std::vector<int>> grid = waitingArea->getAgentGrid(
+      doorsAreOpen, waitingTime, simStart, agentNumber);
 
   int row{0};
   int const title_column{2};
-  int maxAgentNumber = waitingArea->getAgentVector().size() / 2; 
-  int agentNumberExit = agentNumber + maxAgentNumber; 
+  int maxAgentNumber = waitingArea->getAgentVector().size() / 2;
+  int agentNumberExit = agentNumber + maxAgentNumber;
 
   wattron(window, COLOR_PAIR(2));
   mvwprintw(window, ++row, title_column, "WAITING AREA SIMULATION");
   wattroff(window, COLOR_PAIR(2));
 
-  int rowCounter = 3; 
+  int rowCounter = 3;
   int colCounter = 3;
   int colorDoor = (!doorsAreOpen) ? 3 : 7;
-  int colorAgent, colorSelected; 
-  std::string rowString, agentChar; 
+  int colorAgent, colorSelected;
+  std::string rowString, agentChar;
 
   for (auto k : grid) {
     rowCounter++;
@@ -111,34 +113,27 @@ void NCursesDisplay::DisplayAllAgents(
       if (l == AgentPosition::NOT_VISITED_F) {
         rowString = AgentPosition::terminalCode(l);
         mvwprintw(window, rowCounter, colCounter, rowString.c_str());
-      // } else if (l == 1 || l == 7) {
-      //   colorAgent = (l == 1) ? 4 : 3;
-      //   wattron(window, COLOR_PAIR(colorAgent)); 
-      //   rowString = "A ";
-      //   mvwprintw(window, rowCounter, colCounter, rowString.c_str());
-      //   wattroff(window, COLOR_PAIR(colorAgent)); 
       } else if (l == AgentPosition::GOAL) {
-        wattron(window, COLOR_PAIR(colorDoor)); 
+        wattron(window, COLOR_PAIR(colorDoor));
         rowString = AgentPosition::terminalCode(l);
         mvwprintw(window, rowCounter, colCounter, rowString.c_str());
-        wattroff(window, COLOR_PAIR(colorDoor)); 
-        // For agentNumber in range of 0 -> maxAgentNumber / 2
-      } else if (l == agentNumber){
+        wattroff(window, COLOR_PAIR(colorDoor));
+      } else if (l == agentNumber) {
         rowString = to_string(l);
-        wattron(window, COLOR_PAIR(8)); 
+        wattron(window, COLOR_PAIR(8));
         mvwprintw(window, rowCounter, colCounter, rowString.c_str());
         wattroff(window, COLOR_PAIR(8));
-        // For agentNumber in range of maxAgentNumber / 2 -> maxAgentNumber
       } else {
         colorSelected = (l == agentNumber + maxAgentNumber) ? 7 : 4;
         if (colorSelected == 4) {
           colorSelected = (l < maxAgentNumber) ? 4 : 5;
         }
-        agentChar = (l == agentNumber + maxAgentNumber) ? to_string(l): "A "; 
-        wattron(window, COLOR_PAIR(colorSelected)); 
+        agentChar = (l == agentNumber + maxAgentNumber) ? to_string(l) : "A ";
+        agentChar = (doorsAreOpen == false && colorSelected == 4) ? "X": "A"; 
+        wattron(window, COLOR_PAIR(colorSelected));
         rowString = agentChar;
         mvwprintw(window, rowCounter, colCounter, rowString.c_str());
-        wattroff(window, COLOR_PAIR(colorSelected)); 
+        wattroff(window, COLOR_PAIR(colorSelected));
       }
     }
   }

@@ -239,8 +239,6 @@ std::vector<std::vector<int>> WaitingArea::getAgentGrid(
     // TODO: CHANGE THESE TO FOLLOW AGENTPOSITION
     if (cell->cellIsTaken() == true) {
       grid[y][x] = cell->getCurrentAgentID(); // Give agent ID
-    // } else if (cell->cellIsTaken() == true && cell->isExitAgent() == true) {
-    //   grid[y][x] = 7; //
     } else if (y == this->_y_exit - 1 && x == this->_x_exit - 1) {
       grid[y][x] = AgentPosition::GOAL;  // Exit from waitingArea
     } else {
