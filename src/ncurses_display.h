@@ -1,3 +1,10 @@
+/*
+
+Taken from the Udacity CppND from the system monitor project
+github repo -> https://github.com/udacity/CppND-System-Monitor
+
+*/
+
 #ifndef NCURSES_DISPLAY_H
 #define NCURSES_DISPLAY_H
 
@@ -18,7 +25,7 @@ void DisplayAllAgents(
     std::chrono::time_point<std::chrono::system_clock> &simStart,
     int agentNumber);
 void DisplayAStarPath(WINDOW *window, int n, std::shared_ptr<WaitingArea> waitingArea, int agentNumber);
-std::string ProgressBar(float percent);
+
 }; // namespace NCursesDisplay
 
 #endif

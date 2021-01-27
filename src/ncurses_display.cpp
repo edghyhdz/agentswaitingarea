@@ -19,23 +19,6 @@ github repo -> https://github.com/udacity/CppND-System-Monitor
 using std::string;
 using std::to_string;
 
-// 50 bars uniformly displayed from 0 - 100 %
-// 2% is one bar(|)
-std::string NCursesDisplay::ProgressBar(float percent) {
-  std::string result{"0%"};
-  int size{50};
-  float bars{percent * size};
-
-  for (int i{0}; i < size; ++i) {
-    result += i <= bars ? '|' : ' ';
-  }
-
-  string display{to_string(percent * 100).substr(0, 4)};
-  if (percent < 0.1 || percent == 1.0)
-    display = " " + to_string(percent * 100).substr(0, 3);
-  return result + " " + display + "/100%";
-}
-
 void NCursesDisplay::DisplayStats(
     WINDOW *window, bool &doorsAreOpen, int &waitingTime, long & runSim, std::shared_ptr<WaitingArea> waitingArea) {
   int row{0};
@@ -63,21 +46,6 @@ void NCursesDisplay::DisplayStats(
   mvwprintw(window, ++row, 2, ("Doors opened for: " + to_string(oDoorsTime) + " seconds.").c_str());
   mvwprintw(window, ++row, 2, ("Agents simulated: " + to_string(agents.size())).c_str());
   mvwprintw(window, ++row, 2, ("Agents in waiting area: " + to_string(totalAgents)).c_str()); 
-  // wattron(window, COLOR_PAIR(2));
-  // mvwprintw(window, row, 10, "");
-  // wprintw(window, ProgressBar(0.50).c_str());
-  // wattroff(window, COLOR_PAIR(2));
-  // mvwprintw(window, ++row, 2, "Memory: ");
-  // wattron(window, COLOR_PAIR(2));
-  // mvwprintw(window, row, 10, "");
-  // wprintw(window, ProgressBar(0.50).c_str());
-  // wattroff(window, COLOR_PAIR(2));
-  mvwprintw(window, ++row, 2,
-            ("Agents in waiting area: " + to_string(totalAgents)).c_str()); 
-  mvwprintw(
-      window, ++row, 2,
-      ("Running Processes: " + to_string(40)).c_str());
-  wrefresh(window);
 }
 
 void NCursesDisplay::DisplayAllAgents(
