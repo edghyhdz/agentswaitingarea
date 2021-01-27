@@ -15,12 +15,10 @@ github repo -> https://github.com/udacity/CppND-System-Monitor
 #include "ncurses_display.h"
 #include <fstream>
 
-
 using std::string;
 using std::to_string;
 
-void NCursesDisplay::DisplayStats(
-    WINDOW *window, bool &doorsAreOpen, int &waitingTime, long & runSim, std::shared_ptr<WaitingArea> waitingArea) {
+void NCursesDisplay::DisplayStats(WINDOW *window, bool &doorsAreOpen, int &waitingTime, long & runSim, std::shared_ptr<WaitingArea> waitingArea) {
   int row{0};
   std::string doorsOpenMessage; 
   std::vector<std::shared_ptr<Agent>>  agents; 
@@ -54,7 +52,7 @@ void NCursesDisplay::DisplayAllAgents(
     std::chrono::time_point<std::chrono::system_clock> &simStart,
     int agentNumber) {
 
-  // Fetch agent's grid
+  // Fetch agent's grid to display
   std::vector<std::vector<int>> grid = waitingArea->getAgentGrid(
       doorsAreOpen, waitingTime, simStart, agentNumber);
 
@@ -129,7 +127,7 @@ void NCursesDisplay::DisplayAStarPath(WINDOW *window, int n, std::shared_ptr<Wai
   int colCounter = 3;
   std::string rowString;
 
-  // Draw exit aStarPath 
+  // Draw exiting agent's aStarPath 
   for (auto k : aStarPathExit) {
     rowCounter++;
     colCounter = 3;
@@ -162,7 +160,7 @@ void NCursesDisplay::DisplayAStarPath(WINDOW *window, int n, std::shared_ptr<Wai
     }
   }
 
-  // Draw entrance aStarPath
+  // Draw entering agent's aStarPath
   int colCounterR = 3 + colCounter;
   rowCounter = 3; 
 
@@ -211,7 +209,8 @@ void NCursesDisplay::Display(std::shared_ptr<WaitingArea> waitingArea, int n) {
       newwin(3 + n, x_max -( x_max / 2) - 3, system_window->_maxy + 1, 0);
   WINDOW *graph_window =
       newwin(3 + n, x_max - x_max / 2, system_window->_maxy + 1, x_max / 2 - 1);
-  keypad(system_window, true); 
+  keypad(system_window, true);
+
   // start simulation
   waitingArea->simulate(); 
 
@@ -227,6 +226,8 @@ void NCursesDisplay::Display(std::shared_ptr<WaitingArea> waitingArea, int n) {
 
   wtimeout(system_window, 10);
   while (1) {
+    // Be able to change agent selection -> right hand side window
+    // Displays agents calculated AStar path
     switch (wgetch(system_window)) { 
       case KEY_F0 + 1:
         agentNumber += (agentNumber < (maxAgentNumber - 1)) ? 1 : -agentNumber;
