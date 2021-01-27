@@ -1,4 +1,5 @@
 # Agent-based model 
+`Blue` agents going down towards the `X`, while `orange` angents exiting from the `X` after the `train` has arrived, are directing themselves towards the upper left hand side where the `blue` agents first exited.
 
 <img src="https://github.com/edghyhdz/agentswaitingarea/blob/master/images/terminal.gif" width="700">
 
