@@ -8,6 +8,7 @@ Agent::Agent() {
   _speed = .5; // blocks per second
 }
 
+// Constructor
 Agent::Agent(std::shared_ptr<GridCell> position,
              std::vector<std::shared_ptr<GridCell>> &cells,
              std::shared_ptr<bool> &openDoor, int x_goal, int y_goal, bool exitAgent, int id) {
@@ -89,7 +90,6 @@ void Agent::moveToValidCell() {
   }
 
   // Only to mark path that agent should follow
-  this->_currentPosition->setAStarPath(_currentGrid);
   this->setAStarPath( _currentGrid ); 
 
   std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -109,7 +109,6 @@ void Agent::moveToValidCell() {
     int x_1 = x_this + delta[i][0];
     int y_1 = y_this + delta[i][1];
 
-
     int cellID = this->_currentPosition->getX() * (y_1 + 1) -
                 (this->_currentPosition->getX() - x_1);
 
@@ -118,9 +117,7 @@ void Agent::moveToValidCell() {
     bool on_grid_x = (x_1 >= 0 && x_1 < this->_currentPosition->getX());
     bool on_grid_y = (y_1 >= 0 && y_1 < this->_currentPosition->getY());
     
-    // if (on_grid_x && on_grid_y && cellTaken==false) {
     if (on_grid_x && on_grid_y) {
-
       bool cellTaken = this->_cells.at(cellID)->cellIsTaken();
 
       if (_currentGrid[x_1][y_1] == AgentPosition::FOUND_PATH &&
@@ -132,18 +129,14 @@ void Agent::moveToValidCell() {
       } else if (_currentGrid[x_1][y_1] == AgentPosition::GOAL &&
                  this->_arrivedDestination == false &&
                  (*this->_openDoor) == true) {
-        // Put cell back again until granted access
-        std::cout << "Agent arrived to destination" << std::endl; 
-
         // Get exit Cell ID
         nextGrid = _cells.at(cellID);
         std::chrono::time_point<std::chrono::system_clock> beforeQueue;
         beforeQueue = std::chrono::system_clock::now();
         // Add agent to queue
         nextGrid->addAgentToQueue(this->get_shared_this()); 
-        // After agent has been granted access update cell and move to exit
-        long afterQueue = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - beforeQueue).count(); 
-        std::cout << "Agent was granted acces after: "<< afterQueue << " miliseconds\n"; 
+
+        // Update agent's current position
         this->_currentPosition->updateCell();
         this->arrivedToDestination(); 
         break; 
@@ -188,7 +181,7 @@ void Agent::moveToValidCell() {
       this->setCurrentPosition(nextGrid);
 
     } else {
-
+      // Else move randomly to another cell from validCells vector
       std::random_device rd;
       std::mt19937 eng(rd());
       std::uniform_int_distribution<> distr(0, validCells.size() - 1);
@@ -208,6 +201,8 @@ void Agent::setCurrentPosition(std::shared_ptr<GridCell> position) {
   _currentPosition = position;
 }
 
+// Calculate units until goal -> used to introduce some randomness
+// before arriving to the goal
 int Agent::getUnitsUntilGoal(){
   int totalUnits = 0; 
   for (auto &i : this->_currentGrid){
@@ -323,8 +318,3 @@ void Agent::Search() {
     this->expandNeighbors(current);
   }
 }
-
-/*
-TODO:
-  - ADD MUTEX WHEN CHANGING CELL TO OCCUPIED BY AGENT
-*/

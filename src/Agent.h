@@ -17,8 +17,7 @@ public:
     NOT_VISITED = 0,
     FOUND_PATH = 3,
     CURRENT_AGENT = 6,
-    NOT_VISITED_F = 188  // terminal formatting
-
+    NOT_VISITED_F = 188  // Only for the terminal formatting
   };
 
   static std::string terminalCode(int const position) {
@@ -50,9 +49,7 @@ public:
   void setCurrentPosition(std::shared_ptr<GridCell> position);
   void walk();
   void moveToValidCell();
-  bool checkAgentInCell(); 
-  
-  void calculatePath();  
+ 
   void setGridCells(std::vector<std::shared_ptr<GridCell>> cells); 
   void setCurrentGrid();
   void arrivedToDestination(){ _arrivedDestination=true; }
@@ -64,11 +61,9 @@ public:
   // Related to A* search
   void cellSort(std::vector<std::vector<double>> *v);
   bool checkValidCell(int x, int y); 
-  // Calculate the manhattan distance
   double calculateHeuristic(int x_current, int y_current); 
   void addToOpen(double x, double y, double g, double h); 
   void expandNeighbors(std::vector<double> &current);
-
   int getXGoal() { return _x_goal; } 
   int getYGoal() { return _y_goal; }
   int getAgentID() { return _id; }
