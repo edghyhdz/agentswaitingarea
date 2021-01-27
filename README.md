@@ -37,12 +37,11 @@ Once all dependencies are installed,
 Once installation is complete
 
 1. run `.build/agents_display`
+3. The agents entering will be doing so from the upper left hand side,
+4. The agents exiting the `train` will be doing so from the lower middle part marked with `X`
 2. If you want to check different agent's `a-star` paths, click on `F1` or `F2` to go up or down respectivelly
-    
     * The selected agent will be highlighted in the left hand side of the terminal screen
     * The right hand screen will be displaying
-
-
 
 <p>
   <img src="https://github.com/edghyhdz/agentswaitingarea/blob/master/images/left_hand.gif" width="300" />
