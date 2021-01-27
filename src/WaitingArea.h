@@ -47,7 +47,6 @@ public:
   void updateCell(std::shared_ptr<Agent> agent);
   void addAgentToQueue(std::shared_ptr<Agent> agent);
   bool cellIsTaken() { return _occupied; }
-  void moveToCell();
   int getID() { return _id; }
   void processAgentQueue();
 
@@ -57,11 +56,8 @@ public:
   int getXGoal() { return _x_goal; }
   int getYGoal() { return _y_goal; }
   int getCurrentAgentID(); 
-
-  std::shared_ptr<GridCell> get_shared_this() { return shared_from_this(); }
   bool isExitAgent();
-
-  void setAStarPath(std::vector<std::vector<int>> aPath);
+  std::shared_ptr<GridCell> get_shared_this() { return shared_from_this(); }
   std::vector<std::vector<int>> getAStartPath() { return _aPath; }
 
   // typical behavior methods

@@ -99,11 +99,6 @@ void GridCell::processAgentQueue(){
   }
 }
 
-void GridCell::moveToCell() {}
-void GridCell::setAStarPath(std::vector<std::vector<int>> aPath) {
-  _aPath = aPath;
-};
-
 // Getters
 std::tuple<int, int> GridCell::getCoordinates() { return {this->_coords}; }
 
