@@ -4,7 +4,6 @@
 #include <future>
 #include <iostream>
 #include <memory>
-// #include <opencv2/core.hpp>
 #include <string>
 #include <thread>
 #include <vector>
@@ -94,12 +93,11 @@ public:
   // Creates waiting area
   void constructArea();
   void openDoor(bool open);
-  // Prints waiting area
+
   std::vector<std::vector<int>>
   getAgentGrid(bool &doorsAreOpen, int &waitingTime,
                std::chrono::time_point<std::chrono::system_clock> &simStart, int agentNumber);
   std::vector<std::vector<int>> getAgentsGrid(int agentID); 
-  void printWaitingArea();
   void simulate();
 
 private:

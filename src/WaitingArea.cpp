@@ -138,43 +138,23 @@ WaitingArea::WaitingArea(int width, int height, int x_exit, int y_exit)
   this->_openDoors = std::make_shared<bool>(false); 
 
   this->constructArea();
+  // Total of agents displayed is agentNumber * 2
   int agentNumber = 20;
-  std::vector<int> randVector; 
 
   // Get exit cell id
   int exitID = (width * (_y_exit - 1) + _x_exit) - 1;
 
   std::shared_ptr<GridCell> init_grid, init_grid_exit;
 
+  // Initialize agents on grid
   for (int i = 0; i < agentNumber; ++i) {
-    // Randomly initialize agents on grid
-    std::random_device rd;
-    std::mt19937 eng(rd());
-    std::uniform_int_distribution<> distr(0, _cells.size() - 1);
-    int randNumber = distr(eng); 
-
     init_grid = _cells.at(0);
     init_grid_exit = _cells.at(exitID); 
     
-    // init_grid = _cells.at(i);
     std::shared_ptr<Agent> agent = std::make_shared<Agent>(
         init_grid_exit, _cells, _openDoors, 1, 1, true, i);
     init_grid_exit->updateCell(agent);
-
-    // std::shared_ptr<Agent> agent = std::make_shared<Agent>(init_grid, _cells, _openDoors, x_exit, y_exit);
-    // init_grid->updateCell(agent);
     _agents.emplace_back(agent);
-
-    // if (!(std::count(randVector.begin(), randVector.end(), randNumber))){
-    //   init_grid = _cells.at(randNumber);
-    //   // init_grid = _cells.at(i); 
-    //   std::shared_ptr<Agent> agent = std::make_shared<Agent>(init_grid, _cells);
-    //   init_grid->updateCell(agent);
-    //   _agents.emplace_back(agent);
-
-    //   // add to randVector so that position is not reppeated again
-    //   randVector.push_back(randNumber); 
-    // }
   }
 
   // Agents going out
@@ -189,7 +169,6 @@ WaitingArea::WaitingArea(int width, int height, int x_exit, int y_exit)
 
 WaitingArea::~WaitingArea() {
   // set up thread barrier before this object is destroyed
-  std::cout << "Destructor called\n";
   _threads.front().join();
   std::for_each(_threads.begin(), _threads.end(),
                 [](std::thread &t) { t.join(); });
@@ -199,14 +178,9 @@ WaitingArea::~WaitingArea() {
 }
 
 void WaitingArea::simulate() {
-
   for (auto &a : _agents) {
-    // _threads.emplace_back(std::thread(&Agent::walk, a));
     _threadAgents.emplace_back(std::thread(&Agent::walk, a));
   }
-
-  // Print grid
-  // _threads.emplace_back(std::thread(&WaitingArea::printWaitingArea, this));
 }
 
 // Get agent grid
@@ -236,7 +210,7 @@ std::vector<std::vector<int>> WaitingArea::getAgentGrid(
     std::tuple<int, int> tmp = cell->getCoordinates();
     x = std::get<0>(tmp);
     y = std::get<1>(tmp);
-    // TODO: CHANGE THESE TO FOLLOW AGENTPOSITION
+
     if (cell->cellIsTaken() == true) {
       grid[y][x] = cell->getCurrentAgentID(); // Give agent ID
     } else if (y == this->_y_exit - 1 && x == this->_x_exit - 1) {
@@ -246,85 +220,6 @@ std::vector<std::vector<int>> WaitingArea::getAgentGrid(
     }
   }
   return grid; 
-}
-
-void WaitingArea::printWaitingArea() {
-
-  // Simulation starting time (approx)
-  std::chrono::time_point<std::chrono::system_clock> simStart;
-  simStart = std::chrono::system_clock::now();
-  bool doorsAreOpen = false; 
-  int waitingTime = 5000; // Time until train arrival
-  while (true) {
-
-    long runningSim =
-        std::chrono::duration_cast<std::chrono::milliseconds>(
-            std::chrono::system_clock::now() - simStart)
-            .count();
-
-    // Print train arrival time
-    if (doorsAreOpen == false){
-      std::cout << "Train arrives in: " << (waitingTime - runningSim)/1000 << " seconds" <<std::endl;
-    }
-    else{
-      std::cout << "Train is here! Opened doors" << std::endl; 
-    }
-    // Seconds until train doors are open
-    if (runningSim >= waitingTime && doorsAreOpen == false) {
-      this->openDoor(true); 
-      doorsAreOpen = true; 
-    }
-    
-    std::this_thread::sleep_for(std::chrono::milliseconds(200));
-    std::vector<std::vector<int>> grid(this->_height,
-                                       std::vector<int>(this->_width));
-    int x, y;
-    std::vector<std::vector<int>> a_path;
-    for (auto &cell : _cells) {
-      std::tuple<int, int> tmp = cell->getCoordinates();
-      x = std::get<0>(tmp);
-      y = std::get<1>(tmp);
-
-      if (cell->cellIsTaken()) {
-        // std::cout << "Agent in cell id: " << cell->getID() << std::endl;
-        for (auto &c : _cells) {
-          if (c->getID() == cell->getID()) {
-            a_path = c->getAStartPath();
-          }
-        }
-        grid[y][x] = 1;
-      } else if (y == this->_y_exit - 1 && x == this->_x_exit -1 ){
-        grid[y][x] = 2;
-      }
-      else {
-        grid[y][x] = 0;
-      }
-    }
-    int colorCode = 30; 
-    std::string printGrid;
-
-    for (auto k : grid) {
-      std::string row;
-      for (auto l : k) {
-        if (l == 0) {
-          row += "· ";
-        } else if (l == 1){
-          // row += "A ";
-          row += "\033[1;"+ std::to_string(colorCode) + "mA \033[0m";
-          colorCode++; 
-        }
-        else if (l == 2) {
-          row += "\033[1;31mX \033[0m";
-        }
-      }
-      printGrid += row + "\n";
-    }
-    std::cout << "################################################\n";
-    std::cout << "\n";
-    std::cout << printGrid;
-    std::cout << "\n";
-
-  }
 }
 
 std::vector<std::vector<int>> WaitingArea::getAgentsGrid(int agentID) { 
@@ -365,11 +260,3 @@ std::vector<std::vector<int>> WaitingArea::getAgentsGrid(int agentID) {
 
   return aStarPath; 
 }
-
-// // Test stuff
-// int main() {
-//   int width, height, x, y;
-//   std::cin >> width >> height >> x >> y;
-//   WaitingArea waitingArea = WaitingArea(width, height, x, y);
-//   waitingArea.simulate();
-// }
