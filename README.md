@@ -66,3 +66,40 @@ where several code snippets were used for the terminal user interface
 * As well as material as taught from the CppND from [udacity](https://www.udacity.com/course/c-plus-plus-nanodegree--nd213)
 
 * Other single references are commented inside the code
+
+
+## README (All Rubric Points REQUIRED) 
+
+1. A `README` with instructions is included with the project
+2. The `README` indicates which project is chosen
+3. The `README` includes information about each rubric point addressed
+
+## Compiling and Testing (All Rubric Points REQUIRED)
+
+1. Code is compiling and running
+
+## Loops, Functions, I/O - non written rubrics were not used
+
+1. The project demonstrates an understanding of C++ functions and control structures
+
+## Object Oriented Programming
+
+1. The project uses Object Oriented Programming techniques -> refer to all code in `src/` folder
+2. Classes use appropriate access specifiers for class members
+3. Classes abstract implementation details from their interfaces
+4. Classes encapsulate behavior -> refer to all private methods from code classes
+
+## Memory Management
+
+1. The project makes use of references in function declarations -> refer as an example to `Agent.cpp::12` (agent class constructor)
+2. The project uses destructors appropriately -> refer to `WaitingArea.cpp::163`
+3. The project uses scope / Resource Acquisition Is Initialization (RAII) where appropriate -> refer to `shared_ptr` throughout the code
+4. The project uses move semantics to move data, instead of copying it, where possible -> refer to `WaitingArea.cpp::24` as an example
+5. The project uses smart pointers instead of raw pointers
+
+## Concurrency
+
+1. The project uses multithreading -> refer to `WaitingArea.cpp::118`
+2. A promise and future is used in the project -> refer to `WaitingArea.cpp::81`
+3. A mutex or lock is used in the project -> refer to `WaitingArea.cpp::14`
+
