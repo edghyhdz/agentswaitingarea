@@ -27,7 +27,6 @@ void WaitingAgents::pushBack(std::shared_ptr<Agent> agent,
 // Permit entry to agent that has waited longer
 void WaitingAgents::permitEntryToFirstInQueue() {
   std::lock_guard<std::mutex> lock(_mutex);
-  // std::cout << "Agent was granted acces\n"; 
 
   // get entries from the front of both queues
   auto firstPromise = _promises.begin();
@@ -93,7 +92,6 @@ void GridCell::processAgentQueue(){
     std::this_thread::sleep_for(std::chrono::milliseconds(1)); 
 
     if (this->_waitingAgents.getSize() > 0 && this->_occupied == false){
-      // std::cout << "Agents waiting: " << _waitingAgents.getSize() << std::endl; 
       _waitingAgents.permitEntryToFirstInQueue(); 
     }
   }
